@@ -1,0 +1,46 @@
+{
+  "name": "ubti-ai-atlas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "UBTI AI Atlas \u2014 portfolio of AI agents and use cases by business domain, with an AI-assisted admin panel and Client Mode pitch builder.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "seed": "tsx scripts/seed.ts",
+    "seed:reset": "tsx scripts/seed.ts --reset",
+    "upload:industries": "tsx scripts/upload-industry-images.ts"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource/archivo-narrow": "^5.3.0",
+    "clsx": "^2.1.1",
+    "firebase": "^13.3.0",
+    "firebase-admin": "^14.5.1",
+    "jose": "^6.2.17",
+    "jszip": "^3.10.2",
+    "lucide-react": "^0.577.0",
+    "next": "15.5.29",
+    "pptxgenjs": "^4.0.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "server-only": "^0.0.1",
+    "unpdf": "^2.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.2.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "3.4.19",
+    "tsx": "^4.23.15",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,10 @@
+rules_version = '2';
+// Uploads use short-lived signed URLs minted by the server, and files are served
+// through Firebase download-token URLs. Neither depends on these rules, so deny direct access.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

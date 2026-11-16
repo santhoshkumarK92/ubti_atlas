@@ -1,0 +1,10 @@
+rules_version = '2';
+// UBTI AI Atlas reads and writes Firestore ONLY from the server (Firebase Admin SDK),
+// which bypasses these rules. Browsers never talk to Firestore directly, so lock it down.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -14,7 +14,7 @@ import { deleteProject, duplicateProject, saveProject, setProjectStatus, type Pr
 import { Uploader } from './Uploader';
 import { ChipSelect, Field, FlowEditor, MetricsEditor, Notice, TagsInput, Toggle } from './fields';
 import { KNOWN_TECH_CLIENT } from './known-tech';
-import type { Draft } from '@/lib/intel';
+import type { Draft, EnhanceField } from '@/lib/intel';
 
 type Tab = 'source' | 'content' | 'media' | 'publish';
 type EditableProject = Omit<Project, 'embedding'>;
@@ -95,6 +95,51 @@ export function ProjectEditor({
       setBusy('');
     }
   }
+
+  // ── AI "Enhance" — rewrites one field's pasted text for the public site (Undo restores it)
+  const [enhancing, setEnhancing] = useState<EnhanceField | ''>('');
+  const [undoText, setUndoText] = useState<Partial<Record<EnhanceField, string>>>({});
+  async function enhance(field: EnhanceField, current: string, apply: (v: string) => void) {
+    setEnhancing(field);
+    setMsg(null);
+    try {
+      const r = await fetch('/api/admin/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'enhance', enhance: { field, text: current, title: f.title, industryId: f.industryId, techStack: f.techStack } }),
+      });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error);
+      setUndoText((u) => ({ ...u, [field]: current }));
+      apply(j.text as string);
+    } catch (e) {
+      setMsg({ kind: 'err', text: `Enhance failed: ${(e as Error).message}` });
+    } finally {
+      setEnhancing('');
+    }
+  }
+  /** The ✨ Enhance / Undo controls shown beside a field label. */
+  const enhanceAction = (field: EnhanceField, current: string, apply: (v: string) => void) => {
+    const undo = undoText[field];
+    return (
+      <span className="flex items-center gap-2">
+        {undo !== undefined && enhancing !== field && (
+          <button type="button" onClick={() => { apply(undo); setUndoText((u) => ({ ...u, [field]: undefined })); }} className="text-[11px] font-medium text-muted underline underline-offset-2 hover:text-ink">
+            Undo
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={() => enhance(field, current, apply)}
+          disabled={!aiOn || !current.trim() || !!enhancing}
+          title={aiOn ? 'Rewrite this text so it reads professionally on the website' : 'AI is not configured'}
+          className="btn-ghost btn-sm !px-2 !py-0.5 text-[11px] disabled:opacity-40"
+        >
+          {enhancing === field ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />} Enhance
+        </button>
+      </span>
+    );
+  };
 
   // ── AI draft
   const [overwrite, setOverwrite] = useState(!project.title);
@@ -331,7 +376,7 @@ export function ProjectEditor({
           <div className="space-y-5">
             <div className="card grid gap-4 p-5 md:grid-cols-2">
               <Field label="Project title *" className="md:col-span-2"><input className="input text-base" value={f.title} onChange={(e) => set('title', e.target.value)} placeholder="Freight Invoice & Document AI" /></Field>
-              <Field label="One-line pitch (tagline)" hint="One sentence a salesperson can read aloud." className="md:col-span-2"><textarea rows={2} className="input" value={f.tagline} onChange={(e) => set('tagline', e.target.value)} /></Field>
+              <Field label="One-line pitch (tagline)" action={enhanceAction('tagline', f.tagline, (v) => set('tagline', v))} hint="One sentence a salesperson can read aloud." className="md:col-span-2"><textarea rows={2} className="input" value={f.tagline} onChange={(e) => set('tagline', e.target.value)} /></Field>
               <Field label="Primary business domain *">
                 <select className="input" value={f.industryId} onChange={(e) => set('industryId', e.target.value)}>
                   <option value="">Select…</option>
@@ -349,11 +394,11 @@ export function ProjectEditor({
             </div>
 
             <div className="card space-y-4 p-5">
-              <Field label="The problem" hint="Markdown supported."><textarea rows={4} className="input" value={f.problem} onChange={(e) => set('problem', e.target.value)} /></Field>
-              <Field label="What we built *"><textarea rows={6} className="input" value={f.solution} onChange={(e) => set('solution', e.target.value)} /></Field>
-              <Field label="The impact"><textarea rows={3} className="input" value={f.impact} onChange={(e) => set('impact', e.target.value)} /></Field>
+              <Field label="The problem" action={enhanceAction('problem', f.problem, (v) => set('problem', v))} hint="Markdown supported."><textarea rows={4} className="input" value={f.problem} onChange={(e) => set('problem', e.target.value)} /></Field>
+              <Field label="What we built *" action={enhanceAction('solution', f.solution, (v) => set('solution', v))}><textarea rows={6} className="input" value={f.solution} onChange={(e) => set('solution', e.target.value)} /></Field>
+              <Field label="The impact" action={enhanceAction('impact', f.impact, (v) => set('impact', v))}><textarea rows={3} className="input" value={f.impact} onChange={(e) => set('impact', e.target.value)} /></Field>
               <Field label="ROI & metrics" hint="Only numbers you can stand behind."><MetricsEditor value={f.metrics} onChange={(v) => set('metrics', v)} /></Field>
-              <Field label="Key capabilities" hint="One per line."><textarea rows={4} className="input" value={f.features.join('\n')} onChange={(e) => set('features', e.target.value.split('\n'))} /></Field>
+              <Field label="Key capabilities" action={enhanceAction('features', f.features.join('\n'), (v) => set('features', v.split('\n').filter(Boolean)))} hint="One per line."><textarea rows={4} className="input" value={f.features.join('\n')} onChange={(e) => set('features', e.target.value.split('\n'))} /></Field>
             </div>
 
             <div className="card space-y-4 p-5">
@@ -407,7 +452,7 @@ export function ProjectEditor({
               <Uploader compact className="mt-4" folder={`${folder}/diagram`} accept="image/*" label={f.architecture.image ? 'Replace diagram' : 'Upload diagram image'} onUploaded={(img) => set('architecture', { ...f.architecture, image: img })} />
               <div className="mt-5 grid gap-4">
                 <Field label="Flow (how data moves from source to outcome)"><FlowEditor value={f.architecture.flow} onChange={(v) => set('architecture', { ...f.architecture, flow: v })} /></Field>
-                <Field label="Flow description"><textarea rows={3} className="input" value={f.architecture.description} onChange={(e) => set('architecture', { ...f.architecture, description: e.target.value })} /></Field>
+                <Field label="Flow description" action={enhanceAction('flowDescription', f.architecture.description, (v) => set('architecture', { ...f.architecture, description: v }))}><textarea rows={3} className="input" value={f.architecture.description} onChange={(e) => set('architecture', { ...f.architecture, description: e.target.value })} /></Field>
               </div>
             </div>
 

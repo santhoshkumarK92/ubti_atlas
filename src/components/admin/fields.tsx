@@ -4,10 +4,17 @@ import { ArrowDown, ArrowUp, Plus, Search, X } from 'lucide-react';
 import type { FlowStep, Metric } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
-export function Field({ label, hint, children, className }: { label: string; hint?: string; children: React.ReactNode; className?: string }) {
+export function Field({ label, hint, children, className, action }: { label: string; hint?: string; children: React.ReactNode; className?: string; action?: React.ReactNode }) {
   return (
     <div className={className}>
-      <label className="label">{label}</label>
+      {action ? (
+        <div className="mb-1.5 flex items-center justify-between gap-2">
+          <label className="label !mb-0">{label}</label>
+          {action}
+        </div>
+      ) : (
+        <label className="label">{label}</label>
+      )}
       {children}
       {hint && <p className="mt-1 text-[11px] text-muted">{hint}</p>}
     </div>

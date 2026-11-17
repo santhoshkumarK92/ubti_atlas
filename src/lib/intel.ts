@@ -1,5 +1,5 @@
 import 'server-only';
-import { aiEnabled, chatJSON, imagePart, textPart } from './ai';
+import { aiEnabled, chat, chatJSON, imagePart, textPart } from './ai';
 import type { FlowStep, Industry, Metric, Platform, SlideExtract } from './types';
 import type { PublicProject } from './repo';
 import { mdToPlain, truncate } from './utils';
@@ -268,4 +268,50 @@ Pick the 3-5 projects most relevant to the client and explain why in one short l
   // keep a few extra candidates (unticked) for the salesperson
   for (const x of shortlist) if (picks.length < 8 && !picks.some((p) => p.projectId === x.p.id)) picks.push({ projectId: x.p.id, score: x.score, reason: x.reasons.join(' · '), reframe: x.p.tagline, recommended: false });
   return { usedAI: true, intro: r.intro || fallbackIntro, picks };
+}
+
+// ─── "Enhance" — rewrite pasted text so it reads well on the public site ────
+export type EnhanceField = 'tagline' | 'problem' | 'solution' | 'impact' | 'features' | 'flowDescription';
+export const ENHANCE_FIELDS: EnhanceField[] = ['tagline', 'problem', 'solution', 'impact', 'features', 'flowDescription'];
+
+const ENHANCE_SHAPE: Record<EnhanceField, string> = {
+  tagline: 'A single sentence of at most 20 words that a salesperson could read aloud. No quotation marks, no trailing hype.',
+  problem: 'One or two short paragraphs (about 2-4 sentences in total) describing the business problem the client faced.',
+  solution: 'Short paragraphs that explain what was built and how it works. A short bullet list is fine when it helps. Keep every product and technology name exactly as written.',
+  impact: 'One or two short paragraphs about the outcome for the client. Mention only results already present in the input.',
+  features: 'A list of key capabilities: exactly one per line, each under 12 words, starting with a verb or noun phrase. No bullets, no numbering, no blank lines. Keep the same number of items, merging only true duplicates.',
+  flowDescription: 'Two or three sentences that explain how data moves from the source systems to the outcome.',
+};
+
+const ENHANCE_SYSTEM = (field: EnhanceField, ctx: string) => `You are a senior B2B copywriter polishing content for the public website of an enterprise AI team's portfolio.
+Rewrite the text the user sends so it is clear, professional and suitable for publishing: fix grammar and spelling, remove filler and internal jargon, use confident active language, and keep a neutral, credible tone (no marketing clichés or exaggeration).
+Hard rules:
+- Keep every fact. Do NOT add numbers, percentages, ROI, timelines, features, technologies, customers or claims that are not in the input.
+- Do NOT add qualifiers or details of your own (for example "validated", "automated", "real-time", "for review") unless the input says so. Improve wording only.
+- Do NOT mention any client or company name that is not already in the input.
+- Keep the original meaning, and keep Markdown formatting valid.
+- Write in English.
+Required shape: ${ENHANCE_SHAPE[field]}${ctx ? `\nContext about the project (for understanding only, do not copy it in): ${ctx}` : ''}
+Return ONLY the rewritten text, with no preface, no quotation marks and no code fences.`;
+
+export async function enhanceText(field: EnhanceField, text: string, ctx: { title?: string; industry?: string; techStack?: string[] } = {}) {
+  if (!aiEnabled) throw new Error('AI is not configured, so Enhance is unavailable.');
+  const input = text.trim();
+  if (!input) throw new Error('There is nothing to enhance yet — paste some text first.');
+  if (input.length > 8000) throw new Error('That text is too long to enhance (max 8,000 characters).');
+  const context = [ctx.title && `Title: ${ctx.title}`, ctx.industry && `Industry: ${ctx.industry}`, ctx.techStack?.length && `Tech: ${ctx.techStack.slice(0, 12).join(', ')}`]
+    .filter(Boolean)
+    .join(' · ');
+  const out = await chat(
+    [
+      { role: 'system', content: ENHANCE_SYSTEM(field, context) },
+      { role: 'user', content: input },
+    ],
+    { temperature: 0.3, maxTokens: 1400 },
+  );
+  let clean = out.trim().replace(/^```[a-z]*\n?|\n?```$/gi, '').trim();
+  if (field === 'tagline') clean = clean.replace(/^["“”']+|["“”']+$/g, '').replace(/\s*\n+\s*/g, ' ');
+  if (field === 'features') clean = clean.split('\n').map((l) => l.replace(/^\s*(?:[-*•]|\d+[.)])\s*/, '').trim()).filter(Boolean).join('\n');
+  if (!clean) throw new Error('The AI returned an empty result — please try again.');
+  return clean;
 }

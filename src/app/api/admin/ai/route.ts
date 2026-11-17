@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { assertPermission } from '@/lib/auth';
 import { getStore } from '@/lib/store';
 import { bytesOf } from '@/lib/storage';
-import { draftFromSlides, readDiagram, suggestForPitch } from '@/lib/intel';
+import { draftFromSlides, enhanceText, ENHANCE_FIELDS, readDiagram, suggestForPitch, type EnhanceField } from '@/lib/intel';
 import { getIndustries, getPlatforms, getVisibleProjects } from '@/lib/repo';
 import type { StoredFile } from '@/lib/types';
 
@@ -18,8 +18,9 @@ async function dataUrl(f: StoredFile) {
 
 export async function POST(req: Request) {
   const body = (await req.json()) as {
-    action: 'draft' | 'diagram' | 'pitch';
+    action: 'draft' | 'diagram' | 'pitch' | 'enhance';
     projectId?: string;
+    enhance?: { field: EnhanceField; text: string; title?: string; industryId?: string; techStack?: string[] };
     selectedSlides?: number[];
     diagram?: StoredFile;
     image?: StoredFile;
@@ -39,6 +40,19 @@ export async function POST(req: Request) {
       const diagram = body.diagram ? { dataUrl: await dataUrl(body.diagram) } : undefined;
       const draft = await draftFromSlides(slides, industries, platforms, diagram);
       return NextResponse.json({ draft });
+    }
+
+    if (body.action === 'enhance') {
+      await assertPermission('projects.edit');
+      const e = body.enhance;
+      if (!e || !ENHANCE_FIELDS.includes(e.field)) throw new Error('Unknown field');
+      // Only the title, industry and tech stack are sent as context — never the real client name.
+      const text = await enhanceText(e.field, String(e.text ?? ''), {
+        title: e.title,
+        industry: industries.find((i) => i.id === e.industryId)?.name,
+        techStack: Array.isArray(e.techStack) ? e.techStack.map(String) : undefined,
+      });
+      return NextResponse.json({ text });
     }
 
     if (body.action === 'diagram') {

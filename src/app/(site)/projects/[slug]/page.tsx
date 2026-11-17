@@ -7,6 +7,7 @@ import { ProjectDetail } from '@/components/site/ProjectDetail';
 import { ProjectCard } from '@/components/site/ProjectCard';
 import { LeadForm } from '@/components/site/LeadForm';
 import { DemoBadge } from '@/components/site/DemoBadge';
+import { Img } from '@/components/ui/Img';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -30,14 +31,26 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <div className="frame row bg-warn/10 px-6 py-2 text-center text-sm text-warn">Preview — this project is <b>{p.status}</b> and only visible to signed-in staff.</div>
       )}
       <section className="frame row grid md:grid-cols-[2fr_1fr]">
-        <div className="p-6 md:p-10">
-          <Link href={industry ? `/industries/${industry.slug}` : '/projects'} className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-ink">
-            <ArrowLeft className="h-4 w-4" /> {industry?.name ?? 'All agents'}
+        <div className="p-5 md:p-7">
+          <Link
+            href={industry ? `/industries/${industry.slug}` : '/projects'}
+            aria-label={`Back to ${industry?.name ?? 'all agents'}`}
+            className="btn-ghost btn-sm"
+          >
+            <ArrowLeft className="h-4 w-4" /> Back
           </Link>
-          <h1 className="h-display mt-8 text-5xl md:text-7xl">{p.title}</h1>
-          <p className="mt-5 max-w-2xl text-lg text-muted">{p.tagline}</p>
+          <div className="mt-4 flex items-center gap-4">
+            <Img
+              src={p.media.thumbnail?.url}
+              alt={p.title}
+              fallbackLabel={p.title}
+              className="h-14 w-14 shrink-0 rounded-full border border-line md:h-16 md:w-16"
+            />
+            <h1 className="h-display min-w-0 text-3xl md:text-4xl">{p.title}</h1>
+          </div>
+          <p className="mt-3 max-w-2xl text-base text-muted">{p.tagline}</p>
         </div>
-        <div className="flex flex-col justify-end gap-4 border-t border-line p-6 md:border-l md:border-t-0 md:p-8">
+        <div className="flex flex-col justify-end gap-3 border-t border-line p-5 md:border-l md:border-t-0 md:p-6">
           <div className="flex flex-wrap gap-1.5">
             {p.isSample && <span className="chip">Sample content</span>}
             {p.visibility !== 'public' && <span className="chip border-warn/40 text-warn">{p.visibility === 'internal' ? 'Internal only' : 'Client links only'}</span>}

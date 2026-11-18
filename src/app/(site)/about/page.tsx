@@ -66,31 +66,54 @@ export default async function About() {
             Our engineers hold Microsoft role-based certifications across AI, Fabric, Power Platform and Azure. Badges are the official Microsoft Learn credential images.
           </p>
         </div>
-        {TRACKS.filter((t) => shown.some((c) => c.track === t)).map((t) => (
-          <div key={t} className="border-b border-line last:border-0">
-            <div className="px-6 pt-6 md:px-10"><span className="eyebrow">{t}</span></div>
-            <div className="grid gap-3 p-4 sm:grid-cols-2 md:p-6 lg:grid-cols-4">
-              {shown.filter((c) => c.track === t).map((c) => (
-                <a key={c.id} href={c.learnUrl} target="_blank" rel="noreferrer" className="group card flex items-center gap-4 p-4 transition hover:border-ink/30">
-                  <CertBadge src={c.badgeUrl} code={c.code} level={c.level} className="h-20 w-20 shrink-0" />
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-display text-xl font-bold">{c.code}</span>
-                      {c.status === 'retired' && <span className="chip px-1.5 py-0 text-[10px]">Retired</span>}
-                    </div>
-                    <div className="mt-0.5 text-[13px] leading-5">{c.name.replace('Microsoft Certified: ', '')}</div>
-                    <div className="mt-1 flex items-center gap-2 text-[11px] text-muted">
-                      <span>{c.level}</span>
-                      {c.holders > 0 && <span>· {c.holders} certified</span>}
-                      <ExternalLink className="h-3 w-3 opacity-0 transition group-hover:opacity-100" />
-                    </div>
-                    {c.note && <div className="mt-1 text-[11px] text-muted">{c.note}</div>}
-                  </div>
-                </a>
-              ))}
+        {TRACKS.filter((t) => shown.some((c) => c.track === t)).map((t) => {
+          const list = shown.filter((c) => c.track === t);
+          // Repeat short tracks so one half of the strip always fills a wide screen, then double it for a seamless loop.
+          const half = Array.from({ length: Math.max(list.length, Math.ceil(8 / list.length) * list.length) }, (_, i) => list[i % list.length]!);
+          return (
+            <div key={t} className="border-b border-line last:border-0">
+              <div className="px-6 pt-6 md:px-10"><span className="eyebrow">{t}</span></div>
+              <div className="relative overflow-hidden py-4 motion-reduce:overflow-x-auto">
+                <div
+                  className="flex w-max animate-marquee gap-4 hover:[animation-play-state:paused] motion-reduce:animate-none"
+                  style={{ animationDuration: `${half.length * 6}s` }}
+                >
+                  {[...half, ...half].map((c, i) => {
+                    const copy = i >= half.length; // the second half only exists to make the loop seamless
+                    return (
+                      <a
+                        key={`${c.id}-${i}`}
+                        href={c.learnUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-hidden={copy || undefined}
+                        tabIndex={copy ? -1 : undefined}
+                        className="group card flex w-[340px] shrink-0 items-center gap-4 p-4 transition hover:border-ink/30"
+                      >
+                        <CertBadge src={c.badgeUrl} code={c.code} level={c.level} className="h-20 w-20 shrink-0" />
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-display text-xl font-bold">{c.code}</span>
+                            {c.status === 'retired' && <span className="chip px-1.5 py-0 text-[10px]">Retired</span>}
+                          </div>
+                          <div className="mt-0.5 line-clamp-2 text-[13px] leading-5">{c.name.replace('Microsoft Certified: ', '')}</div>
+                          <div className="mt-1 flex items-center gap-2 text-[11px] text-muted">
+                            <span>{c.level}</span>
+                            {c.holders > 0 && <span>· {c.holders} certified</span>}
+                            <ExternalLink className="h-3 w-3 opacity-0 transition group-hover:opacity-100" />
+                          </div>
+                          {c.note && <div className="mt-1 line-clamp-1 text-[11px] text-muted">{c.note}</div>}
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+                <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-paper to-transparent" />
+                <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-paper to-transparent" />
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </section>
     </>
   );

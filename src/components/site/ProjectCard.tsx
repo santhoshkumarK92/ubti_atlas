@@ -6,14 +6,14 @@ import type { PublicProject } from '@/lib/repo';
 import { Img } from '../ui/Img';
 import { cn } from '@/lib/utils';
 
-export function ProjectCard({ p, industry, href, reframe, className }: { p: PublicProject; industry?: Industry; href?: string; reframe?: string; className?: string }) {
+export function ProjectCard({ p, industry, href, reframe, className, compact }: { compact?: boolean; p: PublicProject; industry?: Industry; href?: string; reframe?: string; className?: string }) {
   const cover = p.media.thumbnail?.url ?? p.architecture.image?.url ?? p.media.screenshots[0]?.url;
   const hasVideo = !!(p.media.video || p.media.videoEmbedUrl);
   return (
     <Link href={href ?? `/projects/${p.slug}`} className={cn('group card flex flex-col overflow-hidden transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-24px_rgb(var(--ink)/.35)]', className)}>
       <div className="relative">
         {cover ? (
-          <Img src={cover} alt={p.title} className="aspect-[16/9] border-b border-line" imgClassName="object-cover" />
+          <Img src={cover} alt={p.title} className={cn(compact ? "aspect-[2/1]" : "aspect-[16/9]", "border-b border-line")} imgClassName="object-cover" />
         ) : (
           <MiniFlow steps={p.architecture.flow.map((f) => f.title)} label={p.title} />
         )}
@@ -23,15 +23,15 @@ export function ProjectCard({ p, industry, href, reframe, className }: { p: Publ
           {!p.demoUrl && hasVideo && <span className="chip bg-card/90 text-[10px] backdrop-blur"><PlayCircle className="h-3 w-3" /> Video</span>}
         </div>
       </div>
-      <div className="flex flex-1 flex-col p-5">
+      <div className={cn("flex flex-1 flex-col", compact ? "p-4" : "p-5")}>
         <div className="flex items-center justify-between gap-2">
           <span className="eyebrow">{industry?.shortName}</span>
-          <span className="text-[11px] text-muted">{MATURITY[p.maturity]}</span>
+          {!compact && <span className="text-[11px] text-muted">{MATURITY[p.maturity]}</span>}
         </div>
-        <h3 className="mt-2 font-display text-[22px] font-semibold leading-tight">{p.title}</h3>
-        <p className="mt-2 line-clamp-3 text-sm text-muted">{reframe || p.tagline}</p>
+        <h3 className={cn("mt-2 font-display font-semibold leading-tight", compact ? "text-lg" : "text-[22px]")}>{p.title}</h3>
+        <p className={cn("mt-2 text-sm text-muted", compact ? "line-clamp-2 text-[13px]" : "line-clamp-3")}>{reframe || p.tagline}</p>
         <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-4">
-          {p.techStack.slice(0, 3).map((t) => (
+          {p.techStack.slice(0, compact ? 2 : 3).map((t) => (
             <span key={t} className="chip text-[11px]">{t}</span>
           ))}
           <ArrowUpRight className="ml-auto h-4 w-4 text-muted transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" />

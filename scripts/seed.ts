@@ -2,6 +2,8 @@
  * Seed Firestore with industries, systems, certifications, company settings and sample projects.
  *   npm run seed          → adds anything missing (never overwrites)
  *   npm run seed:reset    → overwrites seed documents with the defaults
+ *   npm run seed -- --only=platforms   → seed only the named collections
+ *   npm run seed -- --fill-missing     → also complete existing documents' empty fields (keeps their values)
  * Reads FIREBASE_* from .env.local.
  */
 import fs from 'node:fs';
@@ -29,16 +31,30 @@ const app = initializeApp({ credential: cert({ projectId: FIREBASE_PROJECT_ID, c
 const db = getFirestore(app);
 db.settings({ ignoreUndefinedProperties: true });
 const reset = process.argv.includes('--reset');
+// --only=platforms,certifications  → seed just those collections (e.g. to avoid touching industries)
+// --fill-missing  → for documents that already exist, fill in only their empty fields from the seed (never overwrites values)
+const fillMissing = process.argv.includes('--fill-missing');
+const only = process.argv.find((a) => a.startsWith('--only='))?.slice(7).split(',').filter(Boolean);
 
 (async () => {
   const seed = buildSeed();
-  let added = 0, skipped = 0;
+  let added = 0, skipped = 0, filled = 0;
   for (const [col, docs] of Object.entries(seed)) {
+    if (only && !only.includes(col)) continue;
     for (const d of docs as { id: string }[]) {
       const ref = db.collection(col).doc(d.id);
-      if (!reset && (await ref.get()).exists) { skipped++; continue; }
       const { id, ...data } = d;
       void id;
+      const snap = !reset ? await ref.get() : null;
+      if (snap?.exists) {
+        if (fillMissing) {
+          const cur = snap.data() as Record<string, unknown>;
+          const patch = Object.fromEntries(Object.entries(data).filter(([k, v]) => v !== undefined && (cur[k] === undefined || cur[k] === null || cur[k] === '')));
+          if (Object.keys(patch).length) { await ref.update(patch); filled++; continue; }
+        }
+        skipped++;
+        continue;
+      }
       await ref.set(data);
       added++;
     }

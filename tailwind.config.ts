@@ -24,7 +24,7 @@ export default {
         display: ['"Archivo Narrow"', 'Arial Narrow', 'sans-serif'],
         sans: ['"Inter Variable"', 'Inter', 'system-ui', 'sans-serif'],
       },
-      maxWidth: { frame: '1320px' },
+      maxWidth: { frame: '1640px' },
       keyframes: {
         drift: {
           '0%,100%': { transform: 'translate3d(0,0,0) scale(1)' },

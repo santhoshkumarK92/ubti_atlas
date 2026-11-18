@@ -11,7 +11,7 @@ const LINKS = [
 export function MobileNav({ canAdmin }: { canAdmin: boolean }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button aria-label="Menu" onClick={() => setOpen(true)} className="grid h-9 w-9 place-items-center rounded-full border border-line bg-card">
         <Menu className="h-4 w-4" />
       </button>

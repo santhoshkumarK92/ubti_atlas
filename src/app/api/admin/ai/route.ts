@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { assertPermission } from '@/lib/auth';
 import { getStore } from '@/lib/store';
 import { bytesOf } from '@/lib/storage';
-import { draftFromSlides, enhanceText, ENHANCE_FIELDS, readDiagram, suggestForPitch, type EnhanceField } from '@/lib/intel';
+import { draftFromSlides, enhanceText, formatPostBody, ENHANCE_FIELDS, readDiagram, suggestForPitch, type EnhanceField } from '@/lib/intel';
 import { getIndustries, getPlatforms, getVisibleProjects } from '@/lib/repo';
 import type { StoredFile } from '@/lib/types';
 
@@ -18,7 +18,8 @@ async function dataUrl(f: StoredFile) {
 
 export async function POST(req: Request) {
   const body = (await req.json()) as {
-    action: 'draft' | 'diagram' | 'pitch' | 'enhance';
+    action: 'draft' | 'diagram' | 'pitch' | 'enhance' | 'formatPost';
+    post?: { body: string; title?: string; type?: string };
     projectId?: string;
     enhance?: { field: EnhanceField; text: string; title?: string; industryId?: string; techStack?: string[] };
     selectedSlides?: number[];
@@ -40,6 +41,12 @@ export async function POST(req: Request) {
       const diagram = body.diagram ? { dataUrl: await dataUrl(body.diagram) } : undefined;
       const draft = await draftFromSlides(slides, industries, platforms, diagram);
       return NextResponse.json({ draft });
+    }
+
+    if (body.action === 'formatPost') {
+      await assertPermission('posts.edit');
+      const r = await formatPostBody(String(body.post?.body ?? ''), { title: body.post?.title, type: body.post?.type });
+      return NextResponse.json(r);
     }
 
     if (body.action === 'enhance') {

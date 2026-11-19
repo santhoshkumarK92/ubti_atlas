@@ -6,7 +6,6 @@ import { getIndustries, getPlatforms, getProjectBySlug, getVisibleProjects } fro
 import { ProjectDetail } from '@/components/site/ProjectDetail';
 import { ProjectCard } from '@/components/site/ProjectCard';
 import { LeadForm } from '@/components/site/LeadForm';
-import { DemoBadge } from '@/components/site/DemoBadge';
 import { Img } from '@/components/ui/Img';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -23,7 +22,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const [industries, platforms, all] = await Promise.all([getIndustries(), getPlatforms(), getVisibleProjects(!!user)]);
   const industry = industries.find((i) => i.id === p.industryId);
   const related = all.filter((x) => x.id !== p.id && (x.industryId === p.industryId || x.extraIndustryIds.includes(p.industryId))).slice(0, 3);
-  const hasVideo = !!(p.media.video || p.media.videoEmbedUrl);
 
   return (
     <>
@@ -54,7 +52,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           <div className="flex flex-wrap gap-1.5">
             {p.isSample && <span className="chip">Sample content</span>}
             {p.visibility !== 'public' && <span className="chip border-warn/40 text-warn">{p.visibility === 'internal' ? 'Internal only' : 'Client links only'}</span>}
-            <DemoBadge url={p.demoUrl} status={p.demoStatus} hasVideo={hasVideo} />
           </div>
           <dl className="grid grid-cols-2 gap-3 text-sm">
             <div><dt className="text-xs text-muted">Client</dt><dd className="font-medium">{user ? p.clientName || p.clientDisplay || '—' : p.clientDisplay}</dd></div>

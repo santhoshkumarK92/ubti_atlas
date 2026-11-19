@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
-import { Eye, Loader2, Save, Trash2, X } from 'lucide-react';
+import { Eye, Loader2, Save, Sparkles, Trash2, Undo2, X } from 'lucide-react';
 import type { Industry, Post } from '@/lib/types';
 import type { PublicProject } from '@/lib/repo';
 import { deletePost, savePost } from '@/app/admin/actions';
@@ -18,6 +18,36 @@ export function PostEditor({ post, industries, projects }: { post: Post; industr
   const [pending, start] = useTransition();
   const set = <K extends keyof Post>(k: K, v: Post[K]) => setP((x) => ({ ...x, [k]: v }));
   const base = p.type === 'blog' ? 'blog' : 'case-studies';
+
+  const [enhancing, setEnhancing] = useState(false);
+  const [undoBody, setUndoBody] = useState<string | null>(null);
+
+  const enhance = async () => {
+    setEnhancing(true);
+    setMsg(null);
+    try {
+      const res = await fetch('/api/admin/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'formatPost', post: { body: p.body, title: p.title, type: p.type } }),
+      });
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.error ?? 'Enhance failed');
+      setUndoBody(p.body);
+      set('body', j.text);
+      setPreview(true);
+      setMsg({
+        kind: 'ok',
+        text: j.method === 'ai'
+          ? 'Content enhanced with AI — review the preview, then Save. Use Undo to go back.'
+          : 'Content tidied with basic formatting rules (AI is not configured). Review the preview, then Save.',
+      });
+    } catch (e) {
+      setMsg({ kind: 'err', text: e instanceof Error ? e.message : 'Enhance failed' });
+    } finally {
+      setEnhancing(false);
+    }
+  };
 
   const save = (status?: Post['status']) =>
     start(async () => {
@@ -51,13 +81,23 @@ export function PostEditor({ post, industries, projects }: { post: Post; industr
           <div>
             <div className="mb-1.5 flex items-center justify-between">
               <label className="label mb-0">Body (Markdown)</label>
-              <div className="flex gap-1">
+              <div className="flex flex-wrap gap-1">
+                {undoBody !== null && (
+                  <button onClick={() => { set('body', undoBody); setUndoBody(null); }} className="chip py-0.5 text-[11px]"><Undo2 className="h-3 w-3" /> Undo</button>
+                )}
+                <button
+                  onClick={enhance}
+                  disabled={enhancing || !p.body.trim()}
+                  className="chip border-transparent bg-gradient-to-r from-accent to-violet py-0.5 text-[11px] font-medium text-white disabled:opacity-50"
+                >
+                  {enhancing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />} Enhance
+                </button>
                 <button onClick={() => setPreview(false)} className={cn('chip py-0.5 text-[11px]', !preview && 'chip-on')}>Write</button>
                 <button onClick={() => setPreview(true)} className={cn('chip py-0.5 text-[11px]', preview && 'chip-on')}>Preview</button>
               </div>
             </div>
             {preview ? (
-              <div className="min-h-[420px] rounded-xl border border-line bg-paper p-5"><Markdown>{p.body || '*Nothing yet*'}</Markdown></div>
+              <div className="min-h-[420px] rounded-sm border border-line bg-paper p-5"><Markdown>{p.body || '*Nothing yet*'}</Markdown></div>
             ) : (
               <textarea rows={22} className="input font-mono text-[13px] leading-6" value={p.body} onChange={(e) => set('body', e.target.value)} placeholder={'## The challenge\n\n## What we built\n\n## Results'} />
             )}

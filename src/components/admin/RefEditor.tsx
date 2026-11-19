@@ -81,7 +81,7 @@ export function RefEditor({ col, rows: initial, fields, titleKey, subKey, imageK
       </div>
 
       {edit && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-ink/30 backdrop-blur-sm" onClick={() => setEdit(null)}>
+        <div className="fixed inset-0 z-50 flex justify-end bg-ink/30" onClick={() => setEdit(null)}>
           <div className="h-full w-full max-w-xl animate-fade-up overflow-y-auto border-l border-line bg-paper p-6" onClick={(e) => e.stopPropagation()}>
             <div className="mb-5 flex items-center justify-between">
               <h3 className="font-display text-2xl font-semibold">{edit.id === '__new' ? 'Add' : 'Edit'}</h3>

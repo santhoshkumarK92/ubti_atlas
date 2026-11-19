@@ -56,18 +56,18 @@ export function ChatWidget() {
               <div className="space-y-2">
                 <p className="text-sm text-muted">Try:</p>
                 {EXAMPLES.map((e) => (
-                  <button key={e} onClick={() => ask(e)} className="block w-full rounded-xl border border-line bg-card px-3.5 py-2.5 text-left text-sm hover:border-ink/30">{e}</button>
+                  <button key={e} onClick={() => ask(e)} className="block w-full rounded-sm border border-line bg-card px-3.5 py-2.5 text-left text-sm hover:border-ink/30">{e}</button>
                 ))}
               </div>
             )}
             {msgs.map((m, i) => (
               <div key={i} className={cn('flex', m.role === 'user' && 'justify-end')}>
-                <div className={cn('max-w-[88%] rounded-2xl px-4 py-2.5 text-sm leading-6', m.role === 'user' ? 'bg-ink text-paper' : 'border border-line bg-card')}>
+                <div className={cn('max-w-[88%] rounded-md px-4 py-2.5 text-sm leading-6', m.role === 'user' ? 'bg-ink text-paper' : 'border border-line bg-card')}>
                   <p className="whitespace-pre-wrap">{clean(m.content)}</p>
                   {!!m.projects?.length && (
                     <div className="mt-3 space-y-1.5">
                       {m.projects.slice(0, 4).map((p) => (
-                        <Link key={p.slug} href={`/projects/${p.slug}`} onClick={() => setOpen(false)} className="flex items-center justify-between gap-2 rounded-xl border border-line bg-paper px-3 py-2 hover:border-ink/30">
+                        <Link key={p.slug} href={`/projects/${p.slug}`} onClick={() => setOpen(false)} className="flex items-center justify-between gap-2 rounded-sm border border-line bg-paper px-3 py-2 hover:border-ink/30">
                           <span className="font-medium">{p.title}</span>
                           <span className="shrink-0 text-[11px] text-muted">{p.industry}</span>
                         </Link>

@@ -8,9 +8,9 @@ const lines = Array.from({ length: 26 }, (_, k) => {
 export function Silk({ labels = [] }: { labels?: string[] }) {
   return (
     <div className="silk">
-      <i className="left-[-10%] top-[-20%] h-[70%] w-[60%] animate-drift bg-[#c7cdff]" />
-      <i className="right-[-10%] top-[10%] h-[80%] w-[55%] animate-drift-slow bg-[#ddd0ff]" />
-      <i className="bottom-[-30%] left-[20%] h-[70%] w-[60%] animate-drift bg-[#cfe0ff]" />
+      <i className="left-[-10%] top-[-20%] h-[70%] w-[60%] animate-drift bg-[#b4d4ce]" />
+      <i className="right-[-10%] top-[10%] h-[80%] w-[55%] animate-drift-slow bg-[#f6c835]" />
+      <i className="bottom-[-30%] left-[20%] h-[70%] w-[60%] animate-drift bg-[#bdd5e5]" />
       <svg viewBox="0 0 1240 520" preserveAspectRatio="xMidYMid slice" aria-hidden>
         <defs>
           <linearGradient id="silk-stroke" x1="0" x2="1">
@@ -31,7 +31,7 @@ export function Silk({ labels = [] }: { labels?: string[] }) {
           'right-[26%] top-[46%]', 'left-[46%] bottom-[16%]', 'right-[6%] bottom-[22%]', 'left-[5%] bottom-[12%]',
         ][i];
         return (
-          <span key={l} className={`absolute ${pos} animate-fade-up rounded-full border border-white/60 bg-white/60 px-3 py-1 text-xs font-medium text-[#1d2340] shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-white/10 dark:text-white`} style={{ animationDelay: `${i * 120}ms` }}>
+          <span key={l} className={`absolute ${pos} animate-fade-up rounded-full border border-white/60 bg-card px-3 py-1 text-xs font-medium text-[#1d2340] shadow-sm dark:border-white/10 dark:bg-white/10 dark:text-white`} style={{ animationDelay: `${i * 120}ms` }}>
             {l}
           </span>
         );

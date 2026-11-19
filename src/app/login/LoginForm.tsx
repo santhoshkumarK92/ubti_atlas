@@ -68,7 +68,7 @@ export function LoginForm({ mode, providers, next }: { mode: 'firebase' | 'local
         </form>
       )}
       {mode === 'local' && (
-        <p className="rounded-xl border border-dashed border-line bg-card p-3 text-xs text-muted">
+        <p className="rounded-sm border border-dashed border-line bg-card p-3 text-xs text-muted">
           <b className="text-ink">Local mode</b> — Firebase isn&apos;t configured. Use any email and the <code>DEMO_ADMIN_PASSWORD</code> from <code>.env.local</code> (default <code>atlas-demo</code>). The first person to sign in becomes Admin.
         </p>
       )}

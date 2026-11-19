@@ -315,3 +315,82 @@ export async function enhanceText(field: EnhanceField, text: string, ctx: { titl
   if (!clean) throw new Error('The AI returned an empty result — please try again.');
   return clean;
 }
+
+
+/* ── Blog / case-study body formatter ───────────────────────────────────── */
+
+const LIST_RE = /^(?:[-*]|\d+\.)\s/;
+const RAW_LIST_RE = /^\s*(?:[-*•▪◦●‣▸►–—]|\d+[.)])\s/;
+
+/** Rule-based clean-up used when AI is off (or fails): fixes spacing, bullets, numbering and obvious headings. */
+export function tidyMarkdown(raw: string): string {
+  const text = raw.replace(/\r\n?/g, '\n').replace(/\u00a0/g, ' ').replace(/[\u2028\u2029]/g, '\n').replace(/[ \t]+$/gm, '');
+  const lines = text.split('\n');
+  const out: string[] = [];
+  const isBlank = (l?: string) => !l || !l.trim();
+  const blank = () => { if (out.length && out[out.length - 1] !== '') out.push(''); };
+  let inFence = false;
+
+  lines.forEach((line, i) => {
+    if (/^```/.test(line.trim())) { blank(); out.push(line.trim()); inFence = !inFence; return; }
+    if (inFence) { out.push(line); return; }
+    if (isBlank(line)) { blank(); return; }
+
+    let l = line.trim();
+    l = l.replace(/^[•▪◦●‣▸►–—]\s+/, '- ').replace(/^\*\s+/, '- ').replace(/^-(?=[^\s-])/, '- ');
+    l = l.replace(/^(\d+)\)\s+/, '$1. ');
+    l = l.replace(/^(#{1,6})(?=[^\s#])/, '$1 ');
+
+    const prevLine = lines[i - 1];
+    const prevBlank = i === 0 || isBlank(prevLine) || /[.!?:)"”]$/.test(prevLine!.trim()) || RAW_LIST_RE.test(prevLine!);
+    const hasNext = i + 1 < lines.length;
+    const plain = !/^(?:[-*]\s|\d+\.\s|#|>|\||!\[|\[|\*\*[^*]+\*\*\s*$)/.test(l);
+    const looksLikeHeading = plain && prevBlank && hasNext && l.length <= 70 && !/[.!?,;]$/.test(l) && l.split(/\s+/).length <= 9;
+    if (looksLikeHeading) {
+      blank();
+      out.push(`## ${l.replace(/\*\*/g, '').replace(/:$/, '')}`);
+      out.push('');
+      return;
+    }
+
+    const isList = LIST_RE.test(l);
+    const prev = out[out.length - 1];
+    // A list must be separated from the paragraph above it, and a paragraph from the list above it.
+    if (prev !== undefined && prev !== '' && (isList !== LIST_RE.test(prev) || (isList && /^\d/.test(l) !== /^\d/.test(prev)))) blank();
+    out.push(l.replace(/(\S) {2,}(?=\S)/g, '$1 '));
+    // Adjacent sentences on separate lines become separate paragraphs; hard-wrapped fragments are left to flow together.
+    const next = lines[i + 1];
+    if (!isBlank(next) && !isList && /[.!?:)"”]$/.test(l) && !RAW_LIST_RE.test(next!)) blank();
+  });
+
+  return out.join('\n').replace(/\n{3,}/g, '\n\n').trim() + '\n';
+}
+
+const POST_FORMAT_SYSTEM = `You are an editor who turns rough drafts into clean, readable Markdown for a company blog / case-study page.
+Rules:
+- Keep EVERY fact, number, name and claim. Do not invent anything and do not add new information.
+- Fix structure only: add a logical hierarchy with "## " section headings (and "### " sub-headings when helpful), short paragraphs (2-4 sentences), bullet or numbered lists for enumerations, **bold** for key terms and numbers, and a "> " pull-quote only if the text already contains a quote.
+- Fix spelling, grammar, spacing and inconsistent bullets. Use plain, confident, professional wording.
+- Do not include the title as a heading (the page already shows it). Do not add images or links that are not in the input.
+- Return ONLY the Markdown, with no preface and no code fences.`;
+
+export async function formatPostBody(body: string, ctx: { title?: string; type?: string } = {}) {
+  const input = body.trim();
+  if (!input) throw new Error('There is nothing to enhance yet — paste or write some content first.');
+  if (input.length > 20000) throw new Error('That text is too long to enhance (max 20,000 characters).');
+  if (!aiEnabled) return { text: tidyMarkdown(input), method: 'rules' as const };
+  try {
+    const out = await chat(
+      [
+        { role: 'system', content: POST_FORMAT_SYSTEM },
+        { role: 'user', content: `${ctx.type ? `Type: ${ctx.type}\n` : ''}${ctx.title ? `Title: ${ctx.title}\n` : ''}\n${input}` },
+      ],
+      { temperature: 0.2, maxTokens: 4000 },
+    );
+    const clean = out.trim().replace(/^```[a-z]*\n?|\n?```$/gi, '').trim();
+    if (!clean) throw new Error('empty');
+    return { text: clean + '\n', method: 'ai' as const };
+  } catch {
+    return { text: tidyMarkdown(input), method: 'rules' as const };
+  }
+}

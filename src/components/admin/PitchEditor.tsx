@@ -112,7 +112,7 @@ export function PitchEditor({ pitch, projects, industries, platforms, siteUrl, a
                 const p = byId.get(id);
                 if (!p) return null;
                 return (
-                  <div key={id} className="rounded-xl border border-line bg-paper p-3">
+                  <div key={id} className="rounded-sm border border-line bg-paper p-3">
                     <div className="flex items-start gap-2">
                       <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-ink text-[11px] font-bold text-paper">{i + 1}</span>
                       <div className="min-w-0 flex-1">
@@ -174,7 +174,7 @@ export function PitchEditor({ pitch, projects, industries, platforms, siteUrl, a
               )}
             </div>
             {pitch && (
-              <div className={cn('flex items-center gap-2 rounded-xl border p-3 text-sm', status === 'active' ? 'border-accent/40 bg-accent/5' : 'border-line opacity-60')}>
+              <div className={cn('flex items-center gap-2 rounded-sm border p-3 text-sm', status === 'active' ? 'border-accent/40 bg-accent/5' : 'border-line opacity-60')}>
                 <code className="flex-1 truncate">{link}</code>
                 <button onClick={() => { navigator.clipboard.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); }).catch(() => {}); }} className="btn-ghost btn-sm">
                   {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} {copied ? 'Copied' : 'Copy'}

@@ -14,7 +14,7 @@ export function CertBadge({ src, code, level, className }: { src: string; code: 
   }, [src]);
   if (failed || !src) {
     return (
-      <div className={cn('grid aspect-square place-items-center rounded-2xl border border-line bg-gradient-to-br from-soft to-card text-center', className)}>
+      <div className={cn('grid aspect-square place-items-center rounded-md border border-line bg-gradient-to-br from-soft to-card text-center', className)}>
         <div>
           <div className="font-display text-xl font-bold">{code}</div>
           <div className="text-[10px] uppercase tracking-widest text-muted">{level}</div>

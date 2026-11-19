@@ -30,9 +30,9 @@ export function PostView({ post, industries, projects }: { post: Post; industrie
       </section>
       {cover && <section className="frame row"><Img src={cover} alt={post.title} className="max-h-[520px] min-h-[240px]" /></section>}
       {post.results?.length ? (
-        <section className="frame row grid grid-cols-2 gap-px bg-line md:grid-cols-4">
+        <section className="frame row grid grid-cols-2 gap-px bg-white/70 dark:bg-line md:grid-cols-4">
           {post.results.map((r) => (
-            <div key={r.label} className="bg-paper p-6 md:p-8"><div className="h-display text-5xl">{r.value}</div><div className="mt-2 text-sm text-muted">{r.label}</div></div>
+            <div key={r.label} className="bg-card/60 p-6 md:p-8"><div className="h-display text-5xl">{r.value}</div><div className="mt-2 text-sm text-muted">{r.label}</div></div>
           ))}
         </section>
       ) : null}

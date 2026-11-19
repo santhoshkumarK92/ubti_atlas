@@ -44,14 +44,14 @@ export default async function ProjectsAdmin({ searchParams }: { searchParams: Pr
       </div>
       <div className="card overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="border-b border-line text-left text-xs text-muted">
+          <thead className="border-b border-ink/10 text-left text-xs text-muted">
             <tr><th className="px-4 py-3 font-medium">Project</th><th className="px-4 py-3 font-medium">Industry</th><th className="px-4 py-3 font-medium">Status</th><th className="px-4 py-3 font-medium">Visibility</th><th className="px-4 py-3 font-medium">Complete</th><th className="px-4 py-3 font-medium">Updated</th></tr>
           </thead>
           <tbody className="divide-y divide-line">
             {list.map((p) => {
               const score = completeness(computeGaps(p));
               return (
-                <tr key={p.id} className="hover:bg-soft/50">
+                <tr key={p.id} className="hover:bg-card dark:hover:bg-white/5">
                   <td className="px-4 py-3">
                     <Link href={`/admin/projects/${p.id}`} className="font-medium hover:underline">{p.title || 'Untitled project'}</Link>
                     <div className="text-xs text-muted">{p.clientName ?? '—'}{p.isSample && ' · sample'}{p.featured && ' · featured'}</div>

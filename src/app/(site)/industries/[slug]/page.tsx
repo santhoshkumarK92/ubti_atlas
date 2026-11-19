@@ -31,7 +31,7 @@ export default async function IndustryPage({ params }: { params: Promise<{ slug:
         <div className="flex flex-col justify-between p-6 md:p-10">
           <Link href="/industries" className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-ink"><ArrowLeft className="h-4 w-4" /> All industries</Link>
           <div className="mt-10">
-            <span className="grid h-12 w-12 place-items-center rounded-2xl border border-line bg-card"><Icon name={industry.icon} className="h-6 w-6" /></span>
+            <span className="grid h-12 w-12 place-items-center rounded-md border border-line bg-card"><Icon name={industry.icon} className="h-6 w-6" /></span>
             <h1 className="h-display mt-5 text-5xl md:text-7xl">{industry.name}</h1>
             <p className="mt-4 max-w-lg text-muted">{industry.description}</p>
             <div className="mt-6 flex flex-wrap gap-2">

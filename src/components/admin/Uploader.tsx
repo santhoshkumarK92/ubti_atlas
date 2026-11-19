@@ -69,7 +69,7 @@ export function Uploader({
         onDrop={(e) => { e.preventDefault(); setDrag(false); handle(e.dataTransfer.files); }}
         disabled={pct !== null}
         className={cn(
-          'flex w-full items-center justify-center gap-3 rounded-2xl border border-dashed border-line bg-card text-sm text-muted transition hover:border-accent hover:text-ink',
+          'flex w-full items-center justify-center gap-3 rounded-md border border-dashed border-line bg-card text-sm text-muted transition hover:border-accent hover:text-ink',
           compact ? 'px-4 py-3' : 'flex-col px-6 py-10',
           drag && 'border-accent bg-accent/5',
         )}

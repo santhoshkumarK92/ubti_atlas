@@ -21,7 +21,8 @@ export default {
         bad: v('bad'),
       },
       fontFamily: {
-        display: ['"Archivo Narrow"', 'Arial Narrow', 'sans-serif'],
+        display: ['"Inter Variable"', 'Inter', 'system-ui', 'sans-serif'],
+        serif: ['"Libre Baskerville"', 'Georgia', 'serif'],
         sans: ['"Inter Variable"', 'Inter', 'system-ui', 'sans-serif'],
       },
       maxWidth: { frame: '1640px' },

@@ -10,17 +10,17 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
   const [industries, platforms, projects] = await Promise.all([getIndustries(), getPlatforms(), getVisibleProjects(signedIn)]);
   return (
     <>
-      <section className="frame row grid md:grid-cols-[2fr_1fr]">
-        <div className="p-6 md:p-10">
-          <div className="eyebrow mb-4">The portfolio</div>
-          <h1 className="h-display text-5xl md:text-7xl">Ready-to-deploy<br /><span className="text-muted/60">AI agents</span></h1>
+      <section className="mx-auto mb-6 mt-3 w-full max-w-frame px-3 md:px-6">
+        <div className="relative overflow-hidden rounded-md border border-line bg-gradient-to-br from-[#f8f6f2] via-[#f3f0e8] to-[#ece5d6] dark:from-[#0c1514] dark:via-[#10201e] dark:to-[#142a27]">
+          <div className="pointer-events-none absolute -right-20 top-0 h-80 w-80 rounded-full bg-accent/20 blur-3xl" />
+          <div className="relative p-6 md:p-10">
+            <div className="eyebrow mb-4">The portfolio</div>
+            <h1 className="h-display text-5xl md:text-7xl">Ready-to-deploy<br /><span className="text-muted/60">AI agents</span></h1>
+          </div>
+          <div className="relative">
+            <ProjectExplorer projects={projects} industries={industries} platforms={platforms} initial={sp} />
+          </div>
         </div>
-        <div className="flex items-end border-t border-line p-6 md:border-l md:border-t-0 md:p-10">
-          <p className="text-sm leading-6 text-muted">Every use case our AI team has built — filter by industry, by the system it runs on, by maturity, or by whether there&apos;s a live demo or recording.</p>
-        </div>
-      </section>
-      <section className="frame row">
-        <ProjectExplorer projects={projects} industries={industries} platforms={platforms} initial={sp} />
       </section>
     </>
   );

@@ -254,7 +254,7 @@ export function ProjectEditor({
   return (
     <div>
       {/* Top bar */}
-      <div className="sticky top-0 z-30 -mx-4 mb-6 border-b border-line bg-paper/90 px-4 py-3 backdrop-blur md:-mx-8 md:px-8">
+      <div className="sticky top-0 z-30 -mx-4 mb-6 border-b border-line bg-paper/90 px-4 py-3 md:-mx-8 md:px-8">
         <div className="flex flex-wrap items-center gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 text-xs text-muted">
@@ -292,7 +292,7 @@ export function ProjectEditor({
               </div>
               {busy === 'extract' && <p className="mt-3 flex items-center gap-2 text-sm text-muted"><Loader2 className="h-4 w-4 animate-spin" /> Extracting slides and images…</p>}
               {source && (
-                <div className="mt-4 flex items-center gap-2 rounded-xl border border-line bg-paper p-3 text-sm">
+                <div className="mt-4 flex items-center gap-2 rounded-sm border border-line bg-paper p-3 text-sm">
                   <FileText className="h-4 w-4 text-muted" />
                   <a href={source.file.url} className="truncate hover:underline" target="_blank" rel="noreferrer">{source.fileName}</a>
                   <span className="ml-auto shrink-0 text-xs text-muted">{source.slides.length} {source.kind === 'pdf' ? 'pages' : 'slides'}</span>
@@ -447,7 +447,7 @@ export function ProjectEditor({
               </div>
               <p className="mt-1 text-sm text-muted">Shown as-is on the project page (click to zoom). Pick it from the deck in step 1, or upload a PNG/JPG.</p>
               {f.architecture.image ? (
-                <img src={f.architecture.image.url} alt="Architecture" className="mt-4 max-h-[420px] w-full rounded-xl border border-line bg-white object-contain p-2" />
+                <img src={f.architecture.image.url} alt="Architecture" className="mt-4 max-h-[420px] w-full rounded-sm border border-line bg-white object-contain p-2" />
               ) : null}
               <Uploader compact className="mt-4" folder={`${folder}/diagram`} accept="image/*" label={f.architecture.image ? 'Replace diagram' : 'Upload diagram image'} onUploaded={(img) => set('architecture', { ...f.architecture, image: img })} />
               <div className="mt-5 grid gap-4">
@@ -463,7 +463,7 @@ export function ProjectEditor({
                 <div>
                   {f.media.video ? (
                     <div className="space-y-2">
-                      <video src={f.media.video.url} controls preload="metadata" className="aspect-video w-full rounded-xl border border-line bg-black" />
+                      <video src={f.media.video.url} controls preload="metadata" className="aspect-video w-full rounded-sm border border-line bg-black" />
                       <button onClick={() => set('media', { ...f.media, video: undefined })} className="btn-ghost btn-sm"><Trash2 className="h-3.5 w-3.5" /> Remove video</button>
                     </div>
                   ) : (
@@ -504,7 +504,7 @@ export function ProjectEditor({
               <h3 className="font-display text-xl font-semibold">Screenshots</h3>
               <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {f.media.screenshots.map((s, i) => (
-                  <div key={s.path} className="overflow-hidden rounded-xl border border-line bg-paper">
+                  <div key={s.path} className="overflow-hidden rounded-sm border border-line bg-paper">
                     <img src={s.url} alt="" className="aspect-[16/10] w-full bg-white object-contain" />
                     <div className="flex gap-1 p-2">
                       <input className="input py-1.5 text-xs" placeholder="Caption" value={s.caption ?? ''} onChange={(e) => set('media', { ...f.media, screenshots: f.media.screenshots.map((x, k) => (k === i ? { ...x, caption: e.target.value } : x)) })} />
@@ -532,7 +532,7 @@ export function ProjectEditor({
                   ['microsite', 'Client links only', 'Staff see it; clients only via a tailored /for/… link.'],
                   ['internal', 'Internal only', 'Staff only. Never shown on client links (e.g. NDA work).'],
                 ] as const).map(([v, t, d]) => (
-                  <button key={v} type="button" onClick={() => set('visibility', v)} className={cn('rounded-xl border p-4 text-left transition', f.visibility === v ? 'border-accent ring-4 ring-accent/10' : 'border-line hover:border-ink/30')}>
+                  <button key={v} type="button" onClick={() => set('visibility', v)} className={cn('rounded-sm border p-4 text-left transition', f.visibility === v ? 'border-accent ring-4 ring-accent/10' : 'border-line hover:border-ink/30')}>
                     <div className="font-medium">{t}</div>
                     <div className="mt-1 text-xs text-muted">{d}</div>
                   </button>

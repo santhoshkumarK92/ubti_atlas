@@ -18,9 +18,9 @@ export function ProjectCard({ p, industry, href, reframe, className, compact }: 
           <MiniFlow steps={p.architecture.flow.map((f) => f.title)} label={p.title} />
         )}
         <div className="absolute left-3 top-3 flex gap-1.5">
-          {p.isSample && <span className="chip bg-card/90 text-[10px] backdrop-blur">Sample</span>}
-          {p.demoUrl && p.demoStatus?.ok !== false && <span className="chip bg-card/90 text-[10px] backdrop-blur"><Radio className="h-3 w-3 text-good" /> Live demo</span>}
-          {!p.demoUrl && hasVideo && <span className="chip bg-card/90 text-[10px] backdrop-blur"><PlayCircle className="h-3 w-3" /> Video</span>}
+          {p.isSample && <span className="chip bg-card/90 text-[10px]">Sample</span>}
+          {p.demoUrl && p.demoStatus?.ok !== false && <span className="chip bg-card/90 text-[10px]"><Radio className="h-3 w-3 text-good" /> Live demo</span>}
+          {!p.demoUrl && hasVideo && <span className="chip bg-card/90 text-[10px]"><PlayCircle className="h-3 w-3" /> Video</span>}
         </div>
       </div>
       <div className={cn("flex flex-1 flex-col", compact ? "p-4" : "p-5")}>

@@ -53,7 +53,7 @@ export function TagsInput({ value, onChange, placeholder, suggestions = [] }: { 
         />
       </div>
       {sugg.length > 0 && (
-        <div className="absolute z-20 mt-1 w-full rounded-xl border border-line bg-card p-1 shadow-lg">
+        <div className="absolute z-20 mt-1 w-full rounded-sm border border-line bg-card p-1 shadow-lg">
           {sugg.map((s) => <button key={s} type="button" onMouseDown={(e) => { e.preventDefault(); add(s); }} className="block w-full rounded-lg px-3 py-1.5 text-left text-sm hover:bg-soft">{s}</button>)}
         </div>
       )}
@@ -67,7 +67,7 @@ export function ChipSelect({ options, value, onChange, max, groupBy }: { options
   const groups = groupBy ? [...new Set(filtered.map((o) => o.group ?? ''))] : [''];
   const toggle = (id: string) => onChange(value.includes(id) ? value.filter((x) => x !== id) : max && value.length >= max ? value : [...value, id]);
   return (
-    <div className="rounded-xl border border-line bg-card">
+    <div className="rounded-sm border border-line bg-card">
       <div className="flex items-center gap-2 border-b border-line px-3 py-2">
         <Search className="h-3.5 w-3.5 text-muted" />
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter…" className="flex-1 bg-transparent text-sm outline-none" />
@@ -143,5 +143,5 @@ export function Toggle({ checked, onChange, label }: { checked: boolean; onChang
 
 export function Notice({ kind = 'info', children }: { kind?: 'info' | 'ok' | 'err' | 'warn'; children: React.ReactNode }) {
   const c = { info: 'border-line bg-card text-ink', ok: 'border-good/30 bg-good/5 text-good', err: 'border-bad/30 bg-bad/5 text-bad', warn: 'border-warn/30 bg-warn/5 text-warn' }[kind];
-  return <div className={cn('rounded-xl border px-4 py-3 text-sm', c)}>{children}</div>;
+  return <div className={cn('rounded-sm border px-4 py-3 text-sm', c)}>{children}</div>;
 }

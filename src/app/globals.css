@@ -1,6 +1,4 @@
-@import '@fontsource/archivo-narrow/500.css';
-@import '@fontsource/archivo-narrow/600.css';
-@import '@fontsource/archivo-narrow/700.css';
+@import '@fontsource/libre-baskerville/400.css';
 @import '@fontsource-variable/inter/index.css';
 
 @tailwind base;
@@ -9,50 +7,53 @@
 
 /* ── Theme: "Editorial Grid" ─────────────────────────────────────────── */
 :root {
-  --paper: 247 248 250;
-  --card: 255 255 255;
-  --ink: 11 16 32;
-  --muted: 104 111 128;
-  --line: 226 229 236;
-  --soft: 238 240 246;
-  --accent: 91 108 255;
-  --violet: 139 92 246;
+  --rail: calc(max(0px, (100vw - 1640px) / 2) + clamp(1rem, 4vw, 5rem));
+  --paper: 254 255 250;
+  --card: 248 246 242;
+  --ink: 12 15 20;
+  --muted: 94 96 100;
+  --line: 227 218 201;
+  --soft: 243 240 232;
+  --accent: 27 94 87;
+  --violet: 43 133 124;
   --good: 22 163 74;
   --warn: 202 118 4;
   --bad: 220 38 38;
   color-scheme: light;
 }
 .dark {
-  --paper: 9 12 22;
-  --card: 16 20 34;
-  --ink: 236 238 246;
-  --muted: 146 153 174;
-  --line: 37 43 64;
-  --soft: 23 28 46;
-  --accent: 124 138 255;
-  --violet: 167 139 250;
+  --paper: 12 15 20;
+  --card: 20 25 26;
+  --ink: 254 255 250;
+  --muted: 160 164 160;
+  --line: 48 56 54;
+  --soft: 26 33 33;
+  --accent: 79 178 166;
+  --violet: 246 200 53;
   color-scheme: dark;
 }
 
 html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
-body { @apply bg-paper text-ink font-sans; font-feature-settings: 'cv11', 'ss01'; }
+body { @apply text-ink font-sans; background: none; background-color: rgb(var(--paper)); font-feature-settings: 'cv11', 'ss01'; }
+.dark body { background: none; background-color: rgb(var(--paper)); }
 ::selection { background: rgb(var(--accent) / 0.2); }
 
 @layer components {
+  .rail-pad { padding-left: calc(var(--rail) + 1.5rem); padding-right: clamp(1rem, 3vw, 2.5rem); }
   .frame { @apply mx-auto w-full max-w-frame border-x border-line; }
   .row { @apply relative border-b border-line; }
   .cell { @apply relative border-line; }
-  .h-display { @apply font-display font-semibold tracking-[-0.01em] leading-[0.98]; }
-  .eyebrow { @apply text-[11px] font-semibold uppercase tracking-[0.16em] text-muted; }
-  .btn { @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-medium transition active:scale-[.98] disabled:opacity-50 disabled:pointer-events-none; }
-  .btn-dark { @apply btn bg-ink text-paper shadow-[0_6px_20px_-8px_rgb(var(--ink)/.6)] hover:bg-ink/90; }
+  .h-display { @apply font-display font-bold tracking-[-0.045em] leading-[0.98]; }
+  .eyebrow { @apply text-[11px] font-bold uppercase tracking-[0.18em] text-muted; }
+  .btn { @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm px-5 py-3 text-sm font-semibold transition active:scale-[.98] disabled:opacity-50 disabled:pointer-events-none; }
+  .btn-dark { @apply btn bg-ink text-paper hover:bg-ink/90; }
   .btn-accent { @apply btn bg-accent text-white hover:brightness-110; }
-  .btn-ghost { @apply btn border border-line bg-card text-ink hover:border-ink/40; }
+  .btn-ghost { @apply btn border border-ink/80 bg-transparent text-ink hover:bg-ink hover:text-paper; }
   .btn-sm { @apply px-3.5 py-1.5 text-xs; }
-  .chip { @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-card px-2.5 py-1 text-xs text-ink/80; }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-sm border border-line bg-card px-2.5 py-1 text-xs text-ink/80; }
   .chip-on { @apply border-ink bg-ink text-paper; }
-  .card { @apply rounded-2xl border border-line bg-card; }
-  .input { @apply w-full rounded-xl border border-line bg-card px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted/70 focus:border-accent focus:ring-4 focus:ring-accent/10; }
+  .card { @apply rounded-md border border-line bg-card; }
+  .input { @apply w-full rounded-sm border border-line bg-paper px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted/70 focus:border-accent focus:ring-4 focus:ring-accent/10; }
   .label { @apply mb-1.5 block text-xs font-medium text-muted; }
   .link { @apply underline decoration-line underline-offset-4 hover:decoration-ink; }
   .gradient-text { @apply bg-gradient-to-r from-accent to-violet bg-clip-text text-transparent; }
@@ -65,7 +66,7 @@ body { @apply bg-paper text-ink font-sans; font-feature-settings: 'cv11', 'ss01'
 .plus::after { top: 5px; left: 0; height: 1px; width: 11px; }
 
 /* Silk hero — layered, slowly drifting gradients (no images, no WebGL) */
-.silk { position: absolute; inset: 0; overflow: hidden; background: linear-gradient(135deg, #eef0ff, #f6f3ff 45%, #e9f1ff); }
+.silk { position: absolute; inset: 0; overflow: hidden; background: linear-gradient(135deg, #f8f6f2, #f3f0e8 45%, #ece5d6); }
 .dark .silk { background: linear-gradient(135deg, #111633, #17123a 45%, #0e1a33); }
 .silk i { position: absolute; border-radius: 9999px; filter: blur(40px); opacity: .85; mix-blend-mode: multiply; }
 .dark .silk i { mix-blend-mode: screen; opacity: .55; }
@@ -91,3 +92,9 @@ body { @apply bg-paper text-ink font-sans; font-feature-settings: 'cv11', 'ss01'
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 }
+
+/* Vertical rail: one colour per section + a darker band travelling bottom → top */
+.rail-seg { position: absolute; top: 0; bottom: 0; left: var(--rail); width: 3px; background: var(--c); z-index: 20; pointer-events: none; }
+.rail-glow { position: absolute; top: 0; bottom: 0; left: var(--rail); width: 3px; overflow: hidden; z-index: 30; pointer-events: none; }
+.rail-glow::after { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 24%; background: linear-gradient(to top, transparent, rgba(12, 15, 20, .7) 50%, transparent); animation: rail-up 5.5s linear infinite; }
+@keyframes rail-up { from { top: 100%; } to { top: -24%; } }

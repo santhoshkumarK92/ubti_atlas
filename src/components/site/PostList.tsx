@@ -21,10 +21,10 @@ export function PostList({ posts, base, industries }: { posts: Post[]; base: 'bl
           ) : null}
         </div>
       </Link>
-      <div className="grid gap-px bg-line md:grid-cols-3">
+      <div className="grid gap-px bg-white/70 dark:bg-line md:grid-cols-3">
         {rest.map((p) => (
-          <Link key={p.id} href={`/${base}/${p.slug}`} className="group bg-paper p-6 md:p-8">
-            {(p.cover?.url || p.coverUrl) && <Img src={p.cover?.url || p.coverUrl} alt={p.title} className="mb-5 aspect-[16/9] rounded-xl" />}
+          <Link key={p.id} href={`/${base}/${p.slug}`} className="group bg-card/60 p-6 md:p-8">
+            {(p.cover?.url || p.coverUrl) && <Img src={p.cover?.url || p.coverUrl} alt={p.title} className="mb-5 aspect-[16/9] rounded-sm" />}
             <div className="eyebrow">{formatDate(p.publishedAt)} · {readingMinutes(p.body)} min</div>
             <h3 className="mt-3 font-display text-2xl font-semibold leading-tight group-hover:underline">{p.title}</h3>
             <p className="mt-2 line-clamp-3 text-sm text-muted">{p.excerpt}</p>

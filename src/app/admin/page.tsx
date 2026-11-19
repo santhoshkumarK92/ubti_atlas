@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { AlertTriangle, ArrowUpRight, Eye, Plus } from 'lucide-react';
+import { AlertTriangle, ArrowUpRight, CheckCircle2, Eye, FileEdit, Inbox, Link2, Plus, SearchCheck, type LucideIcon } from 'lucide-react';
 import { can, getUser } from '@/lib/auth';
 import { getStore } from '@/lib/store';
 import { getIndustries } from '@/lib/repo';
@@ -31,33 +31,38 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const newLeads = leads.filter((l) => l.status === 'new');
 
   return (
-    <div>
+    <div className="relative overflow-hidden rounded-md border border-line bg-gradient-to-br from-[#f8f6f2] via-[#f3f0e8] to-[#ece5d6] p-5 dark:from-[#0c1514] dark:via-[#10201e] dark:to-[#142a27] md:p-8">
+      <div className="relative">
       <PageHead title={`Hi ${user.name.split(' ')[0]}`} sub="Everything the AI team has built — and what needs attention before the next client meeting.">
         {can(user.role, 'projects.edit') && <form action={createProject}><button className="btn-dark"><Plus className="h-4 w-4" /> New project</button></form>}
         {can(user.role, 'pitches.edit') && <Link href="/admin/pitches/new" className="btn-ghost">Prepare a client pitch</Link>}
       </PageHead>
-      {denied && <div className="mb-4 rounded-xl border border-warn/30 bg-warn/5 px-4 py-3 text-sm text-warn">Your role doesn&apos;t have access to that page.</div>}
+      {denied && <div className="mb-4 rounded-sm border border-warn/30 bg-warn/5 px-4 py-3 text-sm text-warn">Your role doesn&apos;t have access to that page.</div>}
       {!aiEnabled && can(user.role, 'settings.edit') && (
-        <div className="mb-4 rounded-xl border border-line bg-card px-4 py-3 text-sm text-muted">AI is not configured — drafts use slide text only and diagram reading is off. Set <code>AI_PROVIDER</code> and Azure OpenAI keys in <code>.env.local</code>.</div>
+        <div className="mb-4 rounded-sm border border-line bg-card px-4 py-3 text-sm text-muted">AI is not configured — drafts use slide text only and diagram reading is off. Set <code>AI_PROVIDER</code> and Azure OpenAI keys in <code>.env.local</code>.</div>
       )}
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-        {[
-          ['Published', published.length, '/admin/projects?status=published'],
-          ['In review', review.length, '/admin/projects?status=review'],
-          ['Drafts', drafts.length, '/admin/projects?status=draft'],
-          ['Client links', pitches.filter((p) => p.status === 'active').length, '/admin/pitches'],
-          ['New leads', newLeads.length, '/admin/leads'],
-        ].map(([l, n, href]) => (
-          <Link key={l as string} href={href as string} className="card p-5 transition hover:border-ink/30">
-            <div className="h-display text-4xl">{n}</div>
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+        {([
+          ['Published', published.length, '/admin/projects?status=published', CheckCircle2, 'from-emerald-400 to-teal-500'],
+          ['In review', review.length, '/admin/projects?status=review', SearchCheck, 'from-amber-400 to-orange-500'],
+          ['Drafts', drafts.length, '/admin/projects?status=draft', FileEdit, 'from-slate-400 to-slate-600'],
+          ['Client links', pitches.filter((p) => p.status === 'active').length, '/admin/pitches', Link2, 'from-sky-400 to-accent'],
+          ['New leads', newLeads.length, '/admin/leads', Inbox, 'from-fuchsia-400 to-violet'],
+        ] as [string, number, string, LucideIcon, string][]).map(([l, n, href, Icon, grad]) => (
+          <Link key={l} href={href} className="rounded-md border border-line bg-card shadow-sm  group p-5 transition hover:-translate-y-0.5 hover:bg-card hover:shadow-[0_18px_40px_-24px_rgb(var(--ink)/.35)]">
+            <div className="flex items-start justify-between">
+              <span className={`grid h-10 w-10 place-items-center rounded-sm bg-gradient-to-br ${grad} text-white shadow-sm`}><Icon className="h-5 w-5" /></span>
+              <ArrowUpRight className="h-4 w-4 text-muted opacity-0 transition group-hover:opacity-100" />
+            </div>
+            <div className="h-display mt-4 text-5xl">{n}</div>
             <div className="mt-1 text-sm text-muted">{l}</div>
           </Link>
         ))}
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        <section className="card p-5">
+        <section className="rounded-md border border-line bg-card shadow-sm  p-6">
           <div className="mb-4 flex items-center justify-between"><h2 className="font-display text-xl font-semibold">Needs attention</h2><span className="text-xs text-muted">Lowest completeness first</span></div>
           <div className="divide-y divide-line">
             {weakest.map(({ p, gaps, score }) => (
@@ -74,20 +79,20 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           </div>
         </section>
 
-        <section className="card p-5">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 className="font-display text-xl font-semibold">Coverage by industry</h2><span className="text-xs text-muted">Gaps = what sales can&apos;t show yet</span></div>
+        <section className="rounded-md border border-line bg-card shadow-sm  p-6">
+          <div className="mb-4"><h2 className="font-display text-xl font-semibold">Coverage by industry</h2></div>
           <div className="space-y-1.5">
             {coverage.map(({ i, n }) => (
               <div key={i.id} className="flex items-center gap-3 text-sm">
                 <span className="w-36 truncate text-muted">{i.shortName}</span>
-                <div className="h-2 flex-1 overflow-hidden rounded-full bg-soft"><div className={n ? 'h-full rounded-full bg-gradient-to-r from-accent to-violet' : ''} style={{ width: `${(n / max) * 100}%` }} /></div>
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-ink/10"><div className={n ? 'h-full rounded-full bg-gradient-to-r from-accent to-violet' : ''} style={{ width: `${(n / max) * 100}%` }} /></div>
                 <span className={`w-6 text-right tabular-nums ${n ? '' : 'text-bad'}`}>{n}</span>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="card p-5">
+        <section className="rounded-md border border-line bg-card shadow-sm  p-6">
           <div className="mb-4 flex items-center justify-between"><h2 className="font-display text-xl font-semibold">Client links activity</h2><Link href="/admin/pitches" className="text-xs text-muted hover:text-ink">All →</Link></div>
           <div className="divide-y divide-line">
             {recentPitches.map((p) => (
@@ -100,7 +105,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           </div>
         </section>
 
-        <section className="card p-5">
+        <section className="rounded-md border border-line bg-card shadow-sm  p-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 className="font-display text-xl font-semibold">Demo links</h2>{can(user.role, 'projects.edit') && <HealthCheckButton />}</div>
           {down.length ? (
             <ul className="space-y-2">
@@ -115,7 +120,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       </div>
 
       {can(user.role, 'settings.edit') && (
-        <section className="mt-6 card flex flex-wrap items-center justify-between gap-3 p-5">
+        <section className="mt-6 rounded-md border border-line bg-card shadow-sm  flex flex-wrap items-center justify-between gap-3 p-5">
           <div>
             <div className="font-medium">Sample content</div>
             <p className="text-sm text-muted">{projects.filter((p) => p.isSample).length} sample projects are loaded to show the layout. Remove them once your real projects are in.</p>
@@ -123,6 +128,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           <SampleDataButtons hasSample={projects.some((p) => p.isSample)} empty={projects.length === 0} />
         </section>
       )}
+      </div>
     </div>
   );
 }

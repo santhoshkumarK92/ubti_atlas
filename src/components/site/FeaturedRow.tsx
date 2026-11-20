@@ -3,7 +3,7 @@ import { ArrowUpRight } from 'lucide-react';
 import type { Industry } from '@/lib/types';
 import type { PublicProject } from '@/lib/repo';
 
-const GLOWS = ['#337cb7', '#f6c835', '#dc3f4a', '#2dd4bf'];
+const GLOWS = ['#3f7fe0', '#337cb7', '#22479b', '#132f6e']; // dark blue shades (lighter set: '#bcd6f8', '#a3c4f2', '#c9defa', '#8fb6ee')
 
 /** Home-page featured agent: a clean white card on the pale-blue stage, with a coloured glow that wakes on hover. */
 export function FeaturedRow({ p, industry, index }: { p: PublicProject; industry?: Industry; index: number }) {
@@ -15,7 +15,7 @@ export function FeaturedRow({ p, industry, index }: { p: PublicProject; industry
       className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-[#d0dcf0] bg-white p-6 text-[#0a1b45] shadow-[0_10px_34px_rgba(19,47,110,.07)] transition duration-300 hover:-translate-y-1.5 hover:border-[#22479b]/50 hover:shadow-[0_24px_54px_rgba(19,47,110,.18)] md:p-7"
     >
       <span aria-hidden className="absolute inset-x-0 top-0 h-1.5 bg-[var(--glow)]" />
-      <span aria-hidden className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-[var(--glow)] opacity-15 blur-2xl transition-opacity duration-500 group-hover:opacity-40" />
+      <span aria-hidden className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-[var(--glow)] opacity-25 blur-2xl transition-opacity duration-500 group-hover:opacity-70" />
       <div className="relative flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <span className="font-display text-4xl font-extrabold leading-none tracking-[-0.05em] text-[#22479b]/25 transition-colors group-hover:text-[#22479b]">{String(index + 1).padStart(2, '0')}</span>

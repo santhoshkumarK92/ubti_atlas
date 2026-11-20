@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Menu, X } from 'lucide-react';
 
 const LINKS = [
@@ -11,11 +12,11 @@ const LINKS = [
 export function MobileNav({ canAdmin }: { canAdmin: boolean }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="lg:hidden">
-      <button aria-label="Menu" onClick={() => setOpen(true)} className="grid h-9 w-9 place-items-center rounded-full border border-line bg-card">
+    <div className="xl:hidden">
+      <button aria-label="Menu" onClick={() => setOpen(true)} className="hd-pill grid h-9 w-9 place-items-center rounded-full">
         <Menu className="h-4 w-4" />
       </button>
-      {open && (
+      {open && createPortal(
         <div className="fixed inset-0 z-50 bg-paper p-6 animate-fade-up">
           <button aria-label="Close" onClick={() => setOpen(false)} className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-full border border-line">
             <X className="h-4 w-4" />
@@ -29,7 +30,8 @@ export function MobileNav({ canAdmin }: { canAdmin: boolean }) {
               </li>
             ))}
           </ul>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

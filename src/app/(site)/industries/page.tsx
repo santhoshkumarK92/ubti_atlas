@@ -15,7 +15,7 @@ export default async function IndustriesPage() {
   return (
     <>
       <section className="mx-auto mb-6 mt-3 w-full max-w-frame px-3 md:px-6">
-        <div className="relative overflow-hidden rounded-md border border-line bg-gradient-to-br from-[#f8f6f2] via-[#f3f0e8] to-[#ece5d6] dark:from-[#0c1514] dark:via-[#10201e] dark:to-[#142a27]">
+        <div className="relative overflow-hidden rounded-md border border-line bg-gradient-to-br from-[#f8faff] via-[#f1f5fc] to-[#e6eefb] dark:from-[#0c1514] dark:via-[#10201e] dark:to-[#142a27]">
           <div className="pointer-events-none absolute -right-20 top-0 h-80 w-80 rounded-full bg-accent/20 blur-3xl" />
           <div className="relative p-6 md:p-10">
             <div className="eyebrow mb-4">Business domains</div>

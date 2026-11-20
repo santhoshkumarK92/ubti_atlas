@@ -1,10 +1,15 @@
 import 'server-only';
 import { cache } from 'react';
+import { unstable_cache } from 'next/cache';
 import { getStore } from './store';
 import type { CompanySettings, Industry, Platform, Post, Project, Certification, Pitch } from './types';
 import { stripEmbedding } from './utils';
 import { company as defaultCompany } from '../data/seed';
 import { aiEnabled, embed } from './ai';
+
+/** Cross-request cache (2 min, cleared instantly when staff save anything via bust()) on top of React's per-request cache. */
+const shared = <A extends unknown[], R>(key: string, fn: (...a: A) => Promise<R>) =>
+  cache(unstable_cache(fn, [key], { revalidate: 120, tags: ['site-data'] }));
 
 export type PublicProject = Omit<Project, 'embedding' | 'source'>;
 
@@ -20,22 +25,22 @@ export function forViewer(p: PublicProject, signedIn: boolean): PublicProject {
   return { ...p, clientName: undefined, clientDisplay: p.clientDisplay || 'Confidential client' };
 }
 
-export const getIndustries = cache(async (): Promise<Industry[]> => {
+export const getIndustries = shared('industries', async (): Promise<Industry[]> => {
   const s = await getStore();
   return s.list('industries', { orderBy: ['order', 'asc'] });
 });
 
-export const getPlatforms = cache(async (): Promise<Platform[]> => {
+export const getPlatforms = shared('platforms', async (): Promise<Platform[]> => {
   const s = await getStore();
   return s.list('platforms', { orderBy: ['order', 'asc'] });
 });
 
-export const getCertifications = cache(async (): Promise<Certification[]> => {
+export const getCertifications = shared('certifications', async (): Promise<Certification[]> => {
   const s = await getStore();
   return s.list('certifications', { orderBy: ['order', 'asc'] });
 });
 
-export const getCompany = cache(async (): Promise<CompanySettings> => {
+export const getCompany = shared('company', async (): Promise<CompanySettings> => {
   const s = await getStore();
   return (await s.get('company', 'main')) ?? defaultCompany;
 });
@@ -46,7 +51,7 @@ export const getAllProjects = cache(async (): Promise<Project[]> => {
 });
 
 /** Published projects the current viewer may see on the main site. */
-export const getVisibleProjects = cache(async (signedIn: boolean): Promise<PublicProject[]> => {
+export const getVisibleProjects = shared('visible-projects', async (signedIn: boolean): Promise<PublicProject[]> => {
   const s = await getStore();
   const rows = await s.list('projects', { where: [['status', '==', 'published']], orderBy: ['publishedAt', 'desc'] });
   return rows
@@ -70,7 +75,7 @@ export async function getProjectsByIds(ids: string[]) {
   return rows.filter((p): p is Project => !!p).map(lighten);
 }
 
-export const getPosts = cache(async (type?: Post['type'], includeDrafts = false): Promise<Post[]> => {
+export const getPosts = shared('posts', async (type?: Post['type'], includeDrafts = false): Promise<Post[]> => {
   const s = await getStore();
   const rows = await s.list('posts', { where: type ? [['type', '==', type]] : [], orderBy: ['publishedAt', 'desc'] });
   return includeDrafts ? rows : rows.filter((p) => p.status === 'published');

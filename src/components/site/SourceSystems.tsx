@@ -34,7 +34,7 @@ export function SourceSystems({ platforms }: { platforms: SourcePlatform[] }) {
         <ArrowRight className="h-6 w-6 rotate-90 text-[#f6c835] lg:rotate-0" />
         <div>
           <div className="font-display text-5xl font-extrabold tracking-[-0.05em]">UBTI</div>
-          <div className="mt-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#b4d4ce]">AI layer</div>
+          <div className="mt-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#a9c8f5]">AI layer</div>
         </div>
         <p className="max-w-[18ch] text-[13px] leading-5 text-[#fefffa]/75">Ingest, unify, analyze, act — without moving your data.</p>
         <ArrowRight className="h-6 w-6 rotate-90 text-[#f6c835] lg:rotate-0" />

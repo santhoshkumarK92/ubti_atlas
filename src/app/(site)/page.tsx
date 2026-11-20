@@ -2,14 +2,15 @@ import Link from 'next/link';
 import { Database, Layers, LineChart, Zap } from 'lucide-react';
 import { getUser } from '@/lib/auth';
 import { getCertifications, getCompany, getIndustries, getVisibleProjects } from '@/lib/repo';
-import { IndustryRotator } from '@/components/site/IndustryRotator';
-import { FeaturedRow } from '@/components/site/FeaturedRow';
+import { IndustryExplorer, type ExplorerProject } from '@/components/site/IndustryExplorer';
 import { Agent3DLazy } from '@/components/site/Agent3DLazy';
 import { AgentBubble, Typewriter } from '@/components/site/HeroFx';
 import { WorldMap } from '@/components/site/WorldMap';
 import { StepsShowcase } from '@/components/site/StepsShowcase';
 import { RailBurst } from '@/components/site/RailBurst';
 import { Reveal } from '@/components/site/Reveal';
+import { MATURITY } from '@/lib/types';
+import { RoiSection } from '@/components/site/RoiSection';
 import { CertBadge } from '@/components/ui/CertBadge';
 
 const STEPS = [
@@ -24,10 +25,34 @@ export default async function Home() {
   const [company, industries, projects, certs] = await Promise.all([
     getCompany(), getIndustries(), getVisibleProjects(signedIn), getCertifications(),
   ]);
-  const countFor = (id: string) => projects.filter((p) => p.industryId === id || p.extraIndustryIds.includes(id)).length;
-  const featured = (projects.filter((p) => p.featured).length ? projects.filter((p) => p.featured) : projects).slice(0, 8);
+  const plain = (md: string, max = 150) => {
+    const t = md.replace(/```[\s\S]*?```/g, ' ').replace(/!\[[^\]]*\]\([^)]*\)/g, ' ').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/^\s{0,3}#{1,6}\s+/gm, '').replace(/^\s*([-*+]|\d+\.)\s+/gm, '').replace(/[*_`>~|]/g, '').replace(/\s+/g, ' ').trim();
+    return t.length <= max ? t : t.slice(0, max).replace(/\s+\S*$/, '') + '…';
+  };
+  // up to three agents per industry, featured ones first
+  const explorerData: Record<string, ExplorerProject[]> = Object.fromEntries(
+    industries.map((i) => [
+      i.id,
+      projects
+        .filter((p) => p.industryId === i.id || p.extraIndustryIds.includes(i.id))
+        .sort((a, b) => Number(b.featured) - Number(a.featured))
+        .slice(0, 3)
+        .map((p) => ({
+          slug: p.slug, title: p.title, tagline: p.tagline, thumb: p.media.thumbnail?.url,
+          about: plain(p.impact || p.solution || p.problem || p.tagline), tech: p.techStack, maturity: MATURITY[p.maturity],
+        })),
+    ]),
+  );
   const shownCerts = certs.filter((c) => c.show);
   const [headA, headB] = splitTagline(company.tagline);
+  const avg = (xs: number[]) => (xs.length ? Math.round(xs.reduce((a, b) => a + b, 0) / xs.length) : undefined);
+  const roiFacts = {
+    agents: projects.length,
+    industries: industries.length,
+    weeks: avg(projects.map((x) => x.weeksToDeploy).filter((n): n is number => !!n)),
+    reuse: avg(projects.map((x) => x.reuseScore).filter((n): n is number => typeof n === 'number')),
+  };
+  const roiResults = projects.flatMap((x) => x.metrics.slice(0, 1).map((m) => ({ value: m.value, label: m.label, project: x.title }))).slice(0, 4);
 
   return (
     <div className="relative">
@@ -113,43 +138,25 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* INDUSTRIES */}
-      <section className="relative isolate border-b border-ink">
-        <RailBurst className="bg-white dark:bg-card" />
-        <i aria-hidden className="rail-seg" />
-        <div className="rail-pad py-16 md:py-24">
-          <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
-            <div>
-              <Reveal as="p" className="mb-4 text-[12px] font-bold uppercase tracking-[0.18em] text-accent">Industries</Reveal>
-              <Reveal as="h2" delay={80} className="text-[clamp(1.9rem,3.4vw,3.2rem)] font-extrabold leading-[0.95] tracking-[-0.05em]">Built for <mark className="bg-transparent text-accent">every industry.</mark></Reveal>
-            </div>
-            <p className="max-w-md text-[15px] leading-6 text-muted">Pre-built, industry-specific AI agents designed around real business needs. Pick a domain to see what we have already delivered.</p>
-          </div>
-          <Reveal delay={120}><IndustryRotator items={industries.map((i) => ({ industry: i, count: countFor(i.id) }))} /></Reveal>
-        </div>
-      </section>
-
-
-      {/* FEATURED */}
-      <section className="relative isolate border-b border-ink">
+      {/* INDUSTRIES + FEATURED AGENTS, combined */}
+      <section className="relative isolate overflow-hidden border-b border-ink">
         <RailBurst className="bg-[#e6eefb] dark:bg-card" />
         <div className="rail-pad relative py-16 md:py-24">
           <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
             <div>
-              <Reveal as="p" className="mb-4 text-[12px] font-bold uppercase tracking-[0.18em] text-accent">AI agents</Reveal>
-              <Reveal as="h2" delay={80} className="text-[clamp(1.9rem,3.4vw,3.2rem)] font-extrabold leading-[0.95] tracking-[-0.05em]">Featured <mark className="bg-transparent text-accent">agents.</mark></Reveal>
+              <Reveal as="p" className="mb-4 text-[12px] font-bold uppercase tracking-[0.18em] text-accent">Industries &amp; AI agents</Reveal>
+              <Reveal as="h2" pop delay={80} className="text-[clamp(1.9rem,3.4vw,3.2rem)] font-extrabold leading-[0.95] tracking-[-0.05em]">Built for <mark className="bg-transparent text-accent">every industry.</mark></Reveal>
             </div>
-            <Link href="/projects" className="inline-flex min-h-[48px] items-center rounded-full border border-[#0a1b45] bg-[#0a1b45] px-6 text-[14px] font-bold text-white transition hover:bg-transparent hover:text-[#0a1b45]">Browse all {projects.length} →</Link>
+            <div className="flex max-w-md flex-col items-start gap-4">
+              <p className="text-[15px] leading-6 text-muted">Pre-built, industry-specific AI agents designed around real business needs. Pick a domain to see what we have already delivered.</p>
+              <Link href="/projects" className="inline-flex min-h-[44px] items-center rounded-full border border-[#0a1b45] bg-[#0a1b45] px-6 text-[14px] font-bold text-white transition hover:bg-transparent hover:text-[#0a1b45]">Browse all {projects.length} agents →</Link>
+            </div>
           </div>
-          <div className="grid gap-5 md:grid-cols-2">
-            {featured.map((p, k) => (
-              <Reveal key={p.id} delay={(k % 2) * 90} className="h-full">
-                <FeaturedRow p={p} index={k} industry={industries.find((i) => i.id === p.industryId)} />
-              </Reveal>
-            ))}
-          </div>
+          <IndustryExplorer industries={industries} projects={explorerData} />
         </div>
       </section>
+
+      <RoiSection facts={roiFacts} results={roiResults} />
     </div>
   );
 }

@@ -3,33 +3,37 @@ import { ArrowUpRight } from 'lucide-react';
 import type { Industry } from '@/lib/types';
 import type { PublicProject } from '@/lib/repo';
 
-const TINTS = ['#bdd5e5', '#b4d4ce', '#fae6a1', '#f4c9c4'];
+const GLOWS = ['#337cb7', '#f6c835', '#dc3f4a', '#2dd4bf'];
 
-/** Home-page agent row: big number, bold title, tagline, tags — fills with colour on hover. */
+/** Home-page featured agent: a clean white card on the pale-blue stage, with a coloured glow that wakes on hover. */
 export function FeaturedRow({ p, industry, index }: { p: PublicProject; industry?: Industry; index: number }) {
-  const tint = TINTS[index % TINTS.length]!;
+  const glow = GLOWS[index % GLOWS.length]!;
   return (
     <Link
       href={`/projects/${p.slug}`}
-      style={{ ['--tint' as string]: tint }}
-      className="group grid items-center gap-x-8 gap-y-3 border-b border-ink px-4 py-7 transition-colors duration-300 hover:bg-[var(--tint)] hover:text-[#0c0f14] md:grid-cols-[72px_minmax(0,1.2fr)_minmax(0,1.5fr)_auto] md:px-6 md:py-8"
+      style={{ ['--glow' as string]: glow }}
+      className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-[#d0dcf0] bg-white p-6 text-[#0a1b45] shadow-[0_10px_34px_rgba(19,47,110,.07)] transition duration-300 hover:-translate-y-1.5 hover:border-[#22479b]/50 hover:shadow-[0_24px_54px_rgba(19,47,110,.18)] md:p-7"
     >
-      <span className="font-display text-3xl font-extrabold tracking-[-0.05em] text-muted transition-colors group-hover:text-[#0c0f14] md:text-4xl">{String(index + 1).padStart(2, '0')}</span>
-      <div className="min-w-0">
-        {industry && <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-accent transition-colors group-hover:text-[#0c0f14]/70">{industry.shortName}</div>}
-        <h3 className="text-[clamp(1.4rem,2.3vw,2.2rem)] font-extrabold leading-[1.02] tracking-[-0.045em]">{p.title}</h3>
-      </div>
-      <div className="min-w-0">
-        <p className="line-clamp-2 max-w-[56ch] text-[15px] leading-6 text-muted transition-colors group-hover:text-[#0c0f14]/80">{p.tagline}</p>
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {p.techStack.slice(0, 3).map((t) => (
-            <span key={t} className="border border-line px-2 py-0.5 text-[11px] font-medium text-ink/80 transition-colors group-hover:border-[#0c0f14]/40 group-hover:text-[#0c0f14]">{t}</span>
-          ))}
+      <span aria-hidden className="absolute inset-x-0 top-0 h-1.5 bg-[var(--glow)]" />
+      <span aria-hidden className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-[var(--glow)] opacity-15 blur-2xl transition-opacity duration-500 group-hover:opacity-40" />
+      <div className="relative flex items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <span className="font-display text-4xl font-extrabold leading-none tracking-[-0.05em] text-[#22479b]/25 transition-colors group-hover:text-[#22479b]">{String(index + 1).padStart(2, '0')}</span>
+          {industry && (
+            <span className="rounded-full border border-[#22479b]/25 bg-[#e6eefb] px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.16em] text-[#132f6e]">{industry.shortName}</span>
+          )}
         </div>
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[#0a1b45]/30 transition duration-300 group-hover:border-[#f6c835] group-hover:bg-[#f6c835] group-hover:text-[#0a1b45]">
+          <ArrowUpRight className="h-5 w-5 transition group-hover:rotate-12" />
+        </span>
       </div>
-      <span className="hidden h-12 w-12 shrink-0 place-items-center border-2 border-current transition group-hover:bg-[#0c0f14] group-hover:text-[#fefffa] md:grid">
-        <ArrowUpRight className="h-5 w-5 transition group-hover:rotate-45" />
-      </span>
+      <h3 className="relative mt-6 text-[clamp(1.35rem,2vw,1.9rem)] font-extrabold leading-[1.05] tracking-[-0.04em]">{p.title}</h3>
+      <p className="relative mt-3 line-clamp-2 max-w-[56ch] text-[14.5px] leading-6 text-[#0a1b45]/70">{p.tagline}</p>
+      <div className="relative mt-auto flex flex-wrap gap-1.5 pt-5">
+        {p.techStack.slice(0, 3).map((t) => (
+          <span key={t} className="rounded-full border border-[#d0dcf0] bg-[#f4f7fc] px-2.5 py-0.5 text-[11px] font-semibold text-[#132f6e]">{t}</span>
+        ))}
+      </div>
     </Link>
   );
 }

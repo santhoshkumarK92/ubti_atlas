@@ -31,7 +31,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const newLeads = leads.filter((l) => l.status === 'new');
 
   return (
-    <div className="relative overflow-hidden rounded-md border border-line bg-gradient-to-br from-[#f8f6f2] via-[#f3f0e8] to-[#ece5d6] p-5 dark:from-[#0c1514] dark:via-[#10201e] dark:to-[#142a27] md:p-8">
+    <div className="relative overflow-hidden rounded-md border border-line bg-gradient-to-br from-[#f8faff] via-[#f1f5fc] to-[#e6eefb] p-5 dark:from-[#0c1514] dark:via-[#10201e] dark:to-[#142a27] md:p-8">
       <div className="relative">
       <PageHead title={`Hi ${user.name.split(' ')[0]}`} sub="Everything the AI team has built — and what needs attention before the next client meeting.">
         {can(user.role, 'projects.edit') && <form action={createProject}><button className="btn-dark"><Plus className="h-4 w-4" /> New project</button></form>}

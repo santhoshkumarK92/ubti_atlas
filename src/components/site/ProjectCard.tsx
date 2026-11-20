@@ -4,10 +4,11 @@ import type { Industry } from '@/lib/types';
 import { MATURITY } from '@/lib/types';
 import type { PublicProject } from '@/lib/repo';
 import { Img } from '../ui/Img';
+import { IndustryCover } from './IndustryCover';
 import { cn } from '@/lib/utils';
 
 export function ProjectCard({ p, industry, href, reframe, className, compact }: { compact?: boolean; p: PublicProject; industry?: Industry; href?: string; reframe?: string; className?: string }) {
-  const cover = p.media.thumbnail?.url ?? p.architecture.image?.url ?? p.media.screenshots[0]?.url;
+  const cover = p.media.thumbnail?.url; // only an uploaded thumbnail; otherwise the industry's default cover
   const hasVideo = !!(p.media.video || p.media.videoEmbedUrl);
   return (
     <Link href={href ?? `/projects/${p.slug}`} className={cn('group card flex flex-col overflow-hidden transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-24px_rgb(var(--ink)/.35)]', className)}>
@@ -15,7 +16,7 @@ export function ProjectCard({ p, industry, href, reframe, className, compact }: 
         {cover ? (
           <Img src={cover} alt={p.title} className={cn(compact ? "aspect-[2/1]" : "aspect-[16/9]", "border-b border-line")} imgClassName="object-cover" />
         ) : (
-          <MiniFlow steps={p.architecture.flow.map((f) => f.title)} label={p.title} />
+          <IndustryCover industry={industry} className={cn(compact ? "aspect-[2/1]" : "aspect-[16/9]", "border-b border-line")} />
         )}
         <div className="absolute left-3 top-3 flex gap-1.5">
           {p.isSample && <span className="chip bg-card/90 text-[10px]">Sample</span>}

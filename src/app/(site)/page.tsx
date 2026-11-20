@@ -1,16 +1,16 @@
 import Link from 'next/link';
+import { Database, Layers, LineChart, Zap } from 'lucide-react';
 import { getUser } from '@/lib/auth';
 import { getCertifications, getCompany, getIndustries, getVisibleProjects } from '@/lib/repo';
 import { IndustryRotator } from '@/components/site/IndustryRotator';
 import { FeaturedRow } from '@/components/site/FeaturedRow';
-import { Agent3D } from '@/components/site/Agent3D';
+import { Agent3DLazy } from '@/components/site/Agent3DLazy';
+import { AgentBubble, Typewriter } from '@/components/site/HeroFx';
 import { WorldMap } from '@/components/site/WorldMap';
-import { StepScene } from '@/components/site/StepScenes';
+import { StepsShowcase } from '@/components/site/StepsShowcase';
+import { RailBurst } from '@/components/site/RailBurst';
 import { Reveal } from '@/components/site/Reveal';
 import { CertBadge } from '@/components/ui/CertBadge';
-
-const TINTS = ['#bdd5e5', '#b4d4ce', '#fae6a1', '#f4c9c4'];
-const WORDS = ['One', 'Two', 'Three', 'Four'];
 
 const STEPS = [
   { t: 'Ingest', d: 'Connect databases, ERP, CRM, SaaS and files where they live — mirroring, shortcuts or APIs. No big-bang migration.' },
@@ -33,25 +33,46 @@ export default async function Home() {
     <div className="relative">
       <span aria-hidden className="rail-glow" />
       {/* HERO — one full-width teal background; copy on the left, 3D agent on the right */}
-      <section className="relative isolate overflow-hidden border-b border-ink bg-[#026f6f]">
-        <i aria-hidden className="rail-seg" style={{ ["--c" as string]: "#f6c835" }} />
-        <div className="rail-pad grid items-center gap-8 lg:grid-cols-[1.7fr_1fr]">
-          <div className="py-20 lg:py-28">
-            <div className="max-w-[640px]">
-              <h1 className="animate-fade-up text-[clamp(2.6rem,5.4vw,6.4rem)] font-extrabold leading-[0.92] tracking-[-0.058em] text-[#fefffa]" style={{ textWrap: 'balance' }}>
-                {headA}
-                {headB && <><br /><mark className="bg-transparent text-[#b4d4ce]">{headB}</mark></>}
+      <section data-zone="dark" className="relative isolate -mt-[72px] overflow-hidden border-b border-ink pt-[72px]">
+        <RailBurst className="bg-[radial-gradient(120%_90%_at_15%_0%,#22479b_0%,#132f6e_45%,#0a1b45_100%)]" />
+        {/* colour orbs behind the glass */}
+        <span aria-hidden className="orb orb-a -left-24 top-10 h-[360px] w-[360px] bg-[#f6c835]/70" />
+        <span aria-hidden className="orb orb-b right-[8%] top-[30%] h-[420px] w-[420px] bg-[#3f7fe0]/70" />
+        <span aria-hidden className="orb orb-c bottom-[-80px] left-[34%] h-[340px] w-[340px] bg-[#dc3f4a]/60" />
+        <i aria-hidden className="rail-seg" />
+        <div className="rail-pad relative grid items-center gap-8 lg:grid-cols-[1.7fr_1fr]">
+          <div className="py-14 lg:-translate-y-10 lg:py-20">
+            <div className="glass max-w-[660px] rounded-[28px] p-7 md:p-10">
+              <h1 className="text-drop text-[clamp(2.6rem,5.4vw,6.4rem)] font-extrabold leading-[0.92] tracking-[-0.058em] text-[#fefffa]" style={{ textWrap: 'balance' }}>
+                <span className="pop-emerge" style={{ animationDelay: '80ms' }}>{headA}</span>
+                {headB && <><br /><mark className="pop-emerge bg-transparent text-[#a9c8f5]" style={{ animationDelay: '280ms' }}>{headB}</mark></>}
               </h1>
-              <p style={{ animationDelay: '150ms' }} className="mt-8 max-w-[28ch] animate-fade-up font-serif text-[clamp(1.25rem,1.8vw,1.65rem)] leading-[1.32] text-[#fefffa]">UBTI AI Atlas is the AI work platform for your industry.</p>
-              <p style={{ animationDelay: '300ms' }} className="mt-4 max-w-[46ch] animate-fade-up text-[17px] leading-[1.6] text-[#fefffa]/90">{company.subTagline}</p>
-              <div style={{ animationDelay: '450ms' }} className="mt-9 flex animate-fade-up flex-wrap items-center gap-4">
-                <Link href="/contact" className="inline-flex min-h-[52px] items-center border-2 border-[#f6c835] bg-[#f6c835] px-7 text-[15px] font-bold text-[#0c0f14] transition hover:border-[#fefffa] hover:bg-[#fefffa]">Request a demo</Link>
-                <Link href="/industries" className="inline-flex min-h-[52px] items-center border-2 border-[#0c0f14] bg-[#fefffa] px-7 text-[15px] font-bold text-[#0c0f14] transition hover:bg-[#f6c835]">Explore Atlas</Link>
+              <Typewriter delay={900} text="UBTI AI Atlas is the AI work platform for your industry." className="mt-8 max-w-[28ch] font-serif text-[clamp(1.25rem,1.8vw,1.65rem)] leading-[1.32] text-[#fefffa]" />
+              <div style={{ animationDelay: '300ms' }} className="mt-8 flex animate-fade-up flex-wrap items-center gap-4">
+                <Link href="/contact" className="glass-btn inline-flex min-h-[52px] items-center rounded-full px-7 text-[15px] font-bold transition">Request a demo</Link>
+                <Link href="/industries" className="glass-btn inline-flex min-h-[52px] items-center rounded-full px-7 text-[15px] font-bold transition">Explore Atlas</Link>
               </div>
             </div>
           </div>
-          <div className="relative mx-auto h-[420px] w-full max-w-md lg:h-[620px] lg:max-w-none">
-            <Agent3D className="absolute inset-0" />
+          <div data-hero-stage data-holo="off" className="relative mx-auto h-[420px] w-full max-w-md lg:h-[620px] lg:max-w-none">
+            <span aria-hidden className="halo" />
+            {[
+              { t: 'Ingest', I: Database, c: 'right-2 top-[14%] lg:right-0', d: 2.3 },
+              { t: 'Unify', I: Layers, c: 'right-0 top-[42%] lg:-right-2', d: 2.5 },
+              { t: 'Analyze', I: LineChart, c: 'left-2 bottom-[24%] lg:left-0', d: 2.7 },
+              { t: 'Act', I: Zap, c: 'right-6 bottom-[10%] lg:right-4', d: 2.9 },
+            ].map(({ t, I, c, d }, k) => (
+              <span key={t} aria-hidden className={`chip-glass absolute z-10 ${c}`} style={{ animationDelay: `${d}s` }}>
+                <div className="glass flex items-center gap-2 rounded-2xl px-4 py-2.5 text-[14px] font-bold text-[#fefffa]" style={{ ['--f' as string]: `${k * 0.7}s` }}>
+                  <I className="h-4 w-4 text-[#f6c835]" /> {t}
+                </div>
+              </span>
+            ))}
+            <span aria-hidden className="land-shadow" />
+            <span aria-hidden className="shock" />
+            <span aria-hidden className="shock s2" />
+            <Agent3DLazy className="agent-drop absolute inset-0" />
+            <AgentBubble lines={["Hi, I'm Atlas.", 'I ingest your data, wherever it lives.', 'Ask me anything. I act on it.']} />
           </div>
         </div>
         {/* corner shapes */}
@@ -64,8 +85,9 @@ export default async function Home() {
 
       {/* CERT MARQUEE */}
       {shownCerts.length > 0 && (
-        <section className="relative overflow-hidden border-b border-ink bg-[#f8f6f2] dark:bg-card">
-        <i aria-hidden className="rail-seg" style={{ ["--c" as string]: "#dc3f4a" }} />
+        <section className="relative isolate overflow-hidden border-b border-ink">
+        <RailBurst className="bg-white dark:bg-card" />
+        <i aria-hidden className="rail-seg" />
           <div className="ml-[var(--rail)] overflow-hidden"><div className="flex w-max animate-marquee hover:[animation-play-state:paused]">
             {[...shownCerts, ...shownCerts].map((c, i) => (
               <div key={i} className="flex h-[104px] w-[260px] shrink-0 items-center gap-3 border-r border-line px-5">
@@ -82,34 +104,24 @@ export default async function Home() {
       )}
 
       {/* HOW IT WORKS */}
-      <section className="relative border-b border-ink">
-        <i aria-hidden className="rail-seg" style={{ ["--c" as string]: "#1b8a80" }} />
+      <section className="navy-zone relative isolate border-b border-ink">
+        <i aria-hidden className="rail-seg" />
         <div className="rail-pad py-16 md:py-24">
           <Reveal as="p" className="mb-4 text-[12px] font-bold uppercase tracking-[0.18em] text-accent">How Atlas works</Reveal>
-          <Reveal as="h2" delay={80} className="mb-12 max-w-4xl text-[clamp(2.4rem,5vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.05em]">AI to <mark className="bg-transparent text-accent">Ingest, Unify, Analyze</mark> and Act.</Reveal>
-          <ol className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {STEPS.map((s, i) => (
-              <Reveal as="li" key={s.t} delay={i * 110} className="flex flex-col border border-line bg-[#f8f6f2] dark:bg-card">
-                <div className="px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#0c0f14]" style={{ background: TINTS[i] }}>Step {WORDS[i]}</div>
-                <div className="px-5 pb-6 pt-5">
-                  <h3 className="text-[clamp(1.9rem,2.6vw,2.6rem)] font-extrabold leading-none tracking-[-0.05em]">{s.t}.</h3>
-                  <p className="mt-4 max-w-[34ch] text-[14px] leading-6 text-muted">{s.d}</p>
-                </div>
-                <div className="mt-auto"><StepScene step={i as 0 | 1 | 2 | 3} /></div>
-              </Reveal>
-            ))}
-          </ol>
+          <Reveal as="h2" delay={80} className="mb-12 max-w-4xl text-[clamp(1.9rem,3.4vw,3.2rem)] font-extrabold leading-[0.95] tracking-[-0.05em]">AI to <mark className="bg-transparent text-accent">Ingest, Unify, Analyze</mark> and Act.</Reveal>
+          <Reveal delay={100}><StepsShowcase steps={STEPS.map(({ t, d }) => ({ t, d }))} /></Reveal>
         </div>
       </section>
 
       {/* INDUSTRIES */}
-      <section className="relative border-b border-ink bg-[#f8f6f2] dark:bg-card">
-        <i aria-hidden className="rail-seg" style={{ ["--c" as string]: "#f6c835" }} />
+      <section className="relative isolate border-b border-ink">
+        <RailBurst className="bg-white dark:bg-card" />
+        <i aria-hidden className="rail-seg" />
         <div className="rail-pad py-16 md:py-24">
           <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
             <div>
               <Reveal as="p" className="mb-4 text-[12px] font-bold uppercase tracking-[0.18em] text-accent">Industries</Reveal>
-              <Reveal as="h2" delay={80} className="text-[clamp(2.4rem,5vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.05em]">Built for <mark className="bg-transparent text-accent">every industry.</mark></Reveal>
+              <Reveal as="h2" delay={80} className="text-[clamp(1.9rem,3.4vw,3.2rem)] font-extrabold leading-[0.95] tracking-[-0.05em]">Built for <mark className="bg-transparent text-accent">every industry.</mark></Reveal>
             </div>
             <p className="max-w-md text-[15px] leading-6 text-muted">Pre-built, industry-specific AI agents designed around real business needs. Pick a domain to see what we have already delivered.</p>
           </div>
@@ -119,19 +131,19 @@ export default async function Home() {
 
 
       {/* FEATURED */}
-      <section className="relative border-b border-ink bg-[#f8f6f2] dark:bg-card">
-        <i aria-hidden className="rail-seg" style={{ ["--c" as string]: "#337cb7" }} />
-        <div className="rail-pad py-16 md:py-24">
+      <section className="relative isolate border-b border-ink">
+        <RailBurst className="bg-[#e6eefb] dark:bg-card" />
+        <div className="rail-pad relative py-16 md:py-24">
           <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
             <div>
               <Reveal as="p" className="mb-4 text-[12px] font-bold uppercase tracking-[0.18em] text-accent">AI agents</Reveal>
-              <Reveal as="h2" delay={80} className="text-[clamp(2.4rem,5vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.05em]">Featured agents</Reveal>
+              <Reveal as="h2" delay={80} className="text-[clamp(1.9rem,3.4vw,3.2rem)] font-extrabold leading-[0.95] tracking-[-0.05em]">Featured <mark className="bg-transparent text-accent">agents.</mark></Reveal>
             </div>
-            <Link href="/projects" className="btn-ghost">Browse all {projects.length} →</Link>
+            <Link href="/projects" className="inline-flex min-h-[48px] items-center rounded-full border border-[#0a1b45] bg-[#0a1b45] px-6 text-[14px] font-bold text-white transition hover:bg-transparent hover:text-[#0a1b45]">Browse all {projects.length} →</Link>
           </div>
-          <div className="border-t border-ink">
+          <div className="grid gap-5 md:grid-cols-2">
             {featured.map((p, k) => (
-              <Reveal key={p.id} delay={(k % 3) * 80}>
+              <Reveal key={p.id} delay={(k % 2) * 90} className="h-full">
                 <FeaturedRow p={p} index={k} industry={industries.find((i) => i.id === p.industryId)} />
               </Reveal>
             ))}

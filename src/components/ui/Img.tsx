@@ -4,7 +4,11 @@ import { useEffect, useRef, useState } from 'react';
 import { cn, initials } from '@/lib/utils';
 
 /** <img> with a graceful gradient fallback when the source is missing or fails. */
-export function Img({ src, alt, className, fallbackLabel, imgClassName }: { src?: string; alt: string; className?: string; imgClassName?: string; fallbackLabel?: string }) {
+/** Stock photos are stored at 1400px wide; cards never show them that large, so ask the CDN for a lighter copy. */
+const lighter = (u?: string) => (u && u.includes('images.unsplash.com') ? u.replace(/([?&])w=1400/, '$1w=900') : u);
+
+export function Img({ src: rawSrc, alt, className, fallbackLabel, imgClassName }: { src?: string; alt: string; className?: string; imgClassName?: string; fallbackLabel?: string }) {
+  const src = lighter(rawSrc);
   const [failed, setFailed] = useState(false);
   const ref = useRef<HTMLImageElement>(null);
   // Catch images that failed before hydration (onError fired before React attached)
@@ -21,7 +25,7 @@ export function Img({ src, alt, className, fallbackLabel, imgClassName }: { src?
   }
   return (
     <div className={cn('relative overflow-hidden bg-soft', className)}>
-      <img ref={ref} src={src} alt={alt} loading="lazy" onError={() => setFailed(true)} className={cn('h-full w-full object-cover', imgClassName)} />
+      <img ref={ref} src={src} alt={alt} loading="lazy" onError={() => setFailed(true)} className={cn('h-full w-full', /object-(contain|fill|none|scale-down)/.test(imgClassName ?? '') ? '' : 'object-cover', imgClassName)} />
     </div>
   );
 }

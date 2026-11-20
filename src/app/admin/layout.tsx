@@ -30,7 +30,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!can(user.role, 'admin.view')) redirect('/?notice=viewer');
   return (
     <div className="min-h-screen md:grid md:grid-cols-[240px_1fr]">
-      <aside className="border-b border-line bg-gradient-to-b from-[#f8f6f2] via-[#f3f0e8] to-[#ece5d6] dark:from-[#0c1514] dark:via-[#10201e] dark:to-[#142a27] md:sticky md:top-0 md:h-screen md:border-b-0 md:border-r">
+      <aside className="border-b border-line bg-gradient-to-b from-[#f8faff] via-[#f1f5fc] to-[#e6eefb] dark:from-[#0c1514] dark:via-[#10201e] dark:to-[#142a27] md:sticky md:top-0 md:h-screen md:border-b-0 md:border-r">
         <div className="flex h-full min-h-0 flex-col p-4">
           <div className="flex items-center justify-between px-2 py-2"><Logo href="/" /></div>
           <div className="md:min-h-0 md:flex-1 md:overflow-y-auto md:pr-1"><AdminNav items={NAV.filter((n) => can(user.role, n.perm)).map(({ href, label, icon }) => ({ href, label, icon }))} /></div>

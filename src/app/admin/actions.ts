@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { assertPermission } from '@/lib/auth';
 import { getStore } from '@/lib/store';
 import { refreshEmbedding, uniqueSlug } from '@/lib/repo';
@@ -13,7 +13,7 @@ import { buildSeed } from '@/data/seed';
 
 type Result<T = unknown> = { ok: true; data?: T } | { ok: false; error: string };
 const fail = (e: unknown): { ok: false; error: string } => ({ ok: false, error: (e as Error).message || String(e) });
-const bust = () => revalidatePath('/', 'layout');
+const bust = () => { revalidateTag('site-data'); revalidatePath('/', 'layout'); };
 
 // ─── Projects ───────────────────────────────────────────────────────────────
 export async function createProject() {

@@ -3,7 +3,7 @@ import { NAV_LINKS } from './Header';
 
 export function Footer() {
   return (
-    <footer className="bg-[#0c0f14] text-[#fefffa]">
+    <footer data-zone="dark" className="bg-[#0c0f14] text-[#fefffa]">
       <div className="mx-auto grid max-w-frame gap-10 px-4 py-14 md:px-8 lg:grid-cols-[1.4fr_1fr_1fr]">
         <div>
           <div className="font-display text-3xl font-bold tracking-tight">UBTI AI Atlas</div>
